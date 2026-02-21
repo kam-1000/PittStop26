@@ -179,18 +179,39 @@ canvas {
     <!-- Checkboxes will be dynamically added here -->
 </div>
 
-
+<!-- Chart -->
+        <div class="dashboard" id="chart">
+            <canvas id="inflationChart"></canvas>
+        </div>
 
 <!-- Strategy -->
 <div id="strategy">
     <h2>Trump's Four-Point Inflation Plan</h2>
-    <p>Trump plans to end inflation using these strategies:</p>
+        <p>Trump plans to end inflation using these strategies:</p>
     <h2>1. Lower taxes within America's borders, incentivizing companies to operate locally.</h2>
-    <!-- Chart -->
-    <div class="dashboard" id="chart">
-        <canvas id="inflationChart"></canvas>
-    </div>
-    <p>Trump's plan economic explanation</p>
+        <p>
+            <b>Economic Rationale:</b><br>
+            President Trump claimed that he would lower taxes within American borders, incentivizing companies to operate locally. If his plan is successful, then GDP (gross domestic 
+            product) would be expected to increase. GDP measures the total value of goods and services produced in a country, and an increase in GDP typically indicates 
+            economic growth. By lowering taxes, businesses may have more capital to invest in expansion, hiring, and innovation, which can lead to increased production 
+            and economic activity. This, in turn, could contribute to higher GDP. However, the actual impact on GDP would depend on various factors such as the specific tax
+            policies implemented, the response of businesses and consumers, and overall economic conditions.
+            <br><br>
+            <b>Policy Details</b><br>
+            On July 4th, 2025, President Trump passed the One, Big, Beautiful Bill Act, which significantly affected federal taxes, credits, and deductions. The bill 
+            included provisions that lowered corporate tax rates, provided tax credits for domestic manufacturing, and simplified the tax code for small businesses. 
+            One of the relevant sections is the Qualified Production Property (Section70307). This provision allows businesses to deduct 100 percent of the cost of 
+            property bought and put into use, mainly intended to help businesses that purchase equipment and machinery, plants, or other property used in manufacturing.
+        </p>
+        <!-- GDP Chart -->
+        <div class="dashboard">
+            <canvas id="gdpChart"></canvas>
+        </div>
+        <p>
+            <b>Economic Analysis:</b><br>
+
+        </p>
+
     <h2>2. Raise tariffs to generate revenue and encourage American manufacturing.</h2>
     <p>Trump's plan economic explanation</p>
     <h2>3. Increase domestic oil production to reduce energy costs.</h2>
@@ -231,7 +252,7 @@ const colors = [
     'rgba(156,39,176,1)'
 ];
 
-// Initialize Chart
+// Inflation Chart
 const ctx = document.getElementById('inflationChart').getContext('2d');
 
 const inflationChart = new Chart(ctx, {
@@ -246,30 +267,11 @@ const inflationChart = new Chart(ctx, {
             title: {
                 display: true,
                 text: '12-Month Percent Change in CPI for Selected Items'
-            },
-            legend: {
-                position: 'top'
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: false,
-                title: {
-                    display: true,
-                    text: 'Percent Change (%)'
-                }
-            },
-            x: {
-                title: {
-                    display: true,
-                    text: 'Year Range'
-                }
             }
         }
     }
 });
 
-// Add checkboxes dynamically
 const checkboxContainer = document.getElementById('checkboxes');
 
 Object.keys(cpiData).forEach((category, i) => {
@@ -305,6 +307,56 @@ function updateChart() {
 
 // Initial render
 updateChart();
+
+
+// =======================
+// GDP CHART (Separate)
+// =======================
+
+const gdpLabels = [
+    'Q4 21', 'Q1 22', 'Q2 22','Q3 22','Q4 22','Q1 23',
+    'Q2 23','Q3 23','Q4 23','Q1 24','Q2 24','Q3 24','Q4 24','Q1 25','Q2 25','Q3 25'
+];
+
+const gdpData = [
+    7.0, -1.0, 0.6, 2.9, 2.8, 2.9,
+    2.5, 4.7, 3.4, 0.8, 3.6, 3.3, 1.9, -0.6, 3.8, 4.4
+];
+
+const gdpCtx = document.getElementById('gdpChart').getContext('2d');
+
+new Chart(gdpCtx, {
+    type: 'line',
+    data: {
+        labels: gdpLabels,
+        datasets: [{
+            label: 'Quarterly GDP Growth (%)',
+            data: gdpData,
+            borderColor: 'rgba(31,78,121,1)',
+            backgroundColor: 'rgba(31,78,121,0.2)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Quarterly GDP Growth Rate'
+            }
+        },
+        scales: {
+            y: {
+                title: {
+                    display: true,
+                    text: 'Percent Growth (%)'
+                }
+            }
+        }
+    }
+});
 </script>
 
 </body>
