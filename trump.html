@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Donald J. Trump</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f4f6f9;
+            color: #2c3e50;
+        }
+
+        /* Top Header */
+        .topbar {
+            background-color: #1f4e79;
+            color: white;
+            padding: 18px 30px;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Sidebar */
+        #mySidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 240px;
+            height: 100%;
+            background-color: #ffffff;
+            border-right: 1px solid #e0e6ed;
+            padding-top: 20px;
+        }
+
+        #mySidebar a {
+            display: block;
+            padding: 14px 25px;
+            text-decoration: none;
+            color: #34495e;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
+
+        #mySidebar a:hover {
+            background-color: #e8f1fb;
+            color: #1f4e79;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        #main {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #6c7a89;
+        }
+
+        .card p {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            color: #1f4e79;
+        }
+
+        /* Content Section */
+        .content-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .content-section h2 {
+            margin-top: 0;
+            color: #1f4e79;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="topbar">
+    Donald J. Trump Dashboard
+</div>
+
+<div id="mySidebar">
+    <a href="#biography">Biography</a>
+    <a href="#economic">Economic Policies</a>
+    <a href="#politics">Political Priorities</a>
+    <a href="#education">Early Life & Education</a>
+</div>
+
+<div id="main">
+
+    <h1>Executive Overview</h1>
+
+    <div class="dashboard">
+        <div class="card">
+            <h3>Presidency</h3>
+            <p>45th & 47th</p>
+        </div>
+
+        <div class="card">
+            <h3>Party</h3>
+            <p>Republican</p>
+        </div>
+
+        <div class="card">
+            <h3>Born</h3>
+            <p>June 14, 1946</p>
+        </div>
+
+        <div class="card">
+            <h3>Profession</h3>
+            <p>Businessman / TV Personality</p>
+        </div>
+    </div>
+
+    <div id="biography" class="content-section">
+        <h2>Biography</h2>
+        <p>
+            Donald John Trump is an American businessman, television personality, and politician.
+            He served as the 45th president of the United States from 2017 to 2021 and
+            as the 47th president beginning in 2025.
+        </p>
+        <p>
+            Before entering politics, Trump was known for his real estate business,
+            including hotels, golf courses, and commercial properties. He also gained
+            national recognition as the host of the television show <em>The Apprentice</em>.
+        </p>
+    </div>
+
+    <div id="economic" class="content-section">
+        <h2>Economic Policies</h2>
+        <ul>
+            <li>End inflation, and make America affordable again.</li>
+            <li>Large tax cuts for workers, and no tax on tips.</li>
+            <li>Cancel the electric vehicle mandate and cut costly and burdensome regulations.</li>
+        </ul>
+    </div>
+
+    <div id="politics" class="content-section">
+        <h2>Political Priorities</h2>
+        <ul>
+            <li>Strengthening border security</li>
+            <li>Expanding domestic energy production</li>
+            <li>Supporting law enforcement</li>
+            <li>Rebuilding American manufacturing</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>
