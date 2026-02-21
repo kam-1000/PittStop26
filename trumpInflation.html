@@ -1,169 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Trump - Inflation Analysis</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Trump - Inflation Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background-color: #f4f6f9;
-            color: #2c3e50;
-        }
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f9;
+    color: #2c3e50;
+}
 
-        /* Top Header */
-        .topbar {
-            background-color: #1f4e79;
-            color: white;
-            padding: 18px 30px;
-            font-size: 20px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
+/* Top Header */
+.topbar {
+    background-color: #1f4e79;
+    color: white;
+    padding: 18px 30px;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
 
-        /* Sidebar */
-        #mySidebar {
-            position: fixed;
-            left: 0;
-            top: 60px;
-            width: 240px;
-            height: 100%;
-            background-color: #ffffff;
-            border-right: 1px solid #e0e6ed;
-            padding-top: 20px;
-        }
+/* Sidebar */
+#mySidebar {
+    position: fixed;
+    left: 0;
+    top: 60px;
+    width: 240px;
+    height: calc(100% - 60px);
+    background-color: #ffffff;
+    border-right: 1px solid #e0e6ed;
+    padding-top: 20px;
+    overflow-y: auto;
+}
 
-        #mySidebar a {
-            display: block;
-            padding: 14px 25px;
-            text-decoration: none;
-            color: #34495e;
-            font-size: 14px;
-            transition: 0.2s ease;
-        }
+#mySidebar a {
+    display: block;
+    padding: 14px 25px;
+    text-decoration: none;
+    color: #34495e;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
 
-        #mySidebar a:hover {
-            background-color: #e8f1fb;
-            color: #1f4e79;
-            font-weight: 500;
-        }
+#mySidebar a:hover {
+    background-color: #e8f1fb;
+    color: #1f4e79;
+    font-weight: 500;
+}
 
-        /* Main Content */
-        #main {
-            margin-left: 240px;
-            padding: 30px;
-        }
+/* Main Content */
+#main {
+    margin-left: 240px;
+    padding: 100px 40px 40px 40px;
+}
 
-        /* Dashboard Grid */
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
+h1 {
+    color: #1f4e79;
+    margin-bottom: 20px;
+}
 
-        canvas {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-    </style>
+h2 {
+    color: #1f4e79;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
 
-    <!-- Chart.js library -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* Dashboard Chart */
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+canvas {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Info Boxes */
+.info-boxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.info-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.info-box h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #6c7a89;
+}
+
+.info-box p {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f4e79;
+}
+
+/* Checkbox Container */
+.checkbox-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+.checkbox-container label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin: 20px 0 40px 0;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<div class="topbar">
-    Trump - Inflation Analysis
-</div>
+<div class="topbar">Financial Helper Dashboard</div>
 
 <div id="mySidebar">
     <a href="#chart">Inflation Chart</a>
+    <a href="#strategy">Trump's Plan</a>
+    <a href="#details">Additional Info</a>
 </div>
 
 <div id="main">
-    <h1>Consumer Price Index (CPI) Inflation Rates</h1>
+<h1>Donald J. Trump - Inflation Dashboard</h1>
 
-    <div class="dashboard">
-        <canvas id="inflationChart"></canvas>
+<!-- Info Boxes -->
+<div class="info-boxes">
+    <div class="info-box">
+        <h3>Focus Area</h3>
+        <p>Energy, Taxes, Spending, Manufacturing</p>
+    </div>
+    <div class="info-box">
+        <h3>Target Inflation</h3>
+        <p>2-3%</p>
+    </div>
+    <div class="info-box">
+        <h3>Major Policies</h3>
+        <p>Tax cuts, Tariffs, Oil production, Government efficiency</p>
     </div>
 </div>
 
-<script>
-    const ctx = document.getElementById('inflationChart').getContext('2d');
+<!-- Checkbox selectors for categories -->
+<div class="checkbox-container" id="checkboxes">
+    <strong>Select CPI Categories to Display:</strong>
+    <!-- Checkboxes will be dynamically added here -->
+</div>
 
-    const inflationChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Dec 2020 to Dec 2021', 'Dec 2021 to Dec 2022', 'Dec 2022 to Dec 2023', 'Dec 2023 to Dec 2024', 'Dec 2024 to Dec 2025'],
-            datasets: [
-                {
-                    label: 'Beverage materials including coffee and tea',
-                    data: [3.9, 13.8, 0.3, 3.5, 11.8],
-                    borderColor: 'rgba(31,78,121,1)',
-                    backgroundColor: 'rgba(31,78,121,0.2)',
-                    fill: true,
-                    tension: 0.4
-                },
-                {
-                    label: 'Utility (piped) gas service',
-                    data: [24.1, 19.3, -13.8, 4.9, 10.8],
-                    borderColor: 'rgba(244, 67, 54, 1)',
-                    backgroundColor: 'rgba(244, 67, 54, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                },
-                {
-                    label: 'Fuel oil',
-                    data: [41.0, 41.5, -14.7, -13.1, 7.4],
-                    borderColor: 'rgba(76,175,80,1)',
-                    backgroundColor: 'rgba(76,175,80,0.2)',
-                    fill: true,
-                    tension: 0.4
-                },
-                {
-                    label: 'All items',
-                    data: [7.0, 6.5, 3.4, 2.9, 2.7],
-                    borderColor: 'rgba(255, 193, 7,1)',
-                    backgroundColor: 'rgba(255, 193, 7,0.2)',
-                    fill: true,
-                    tension: 0.4
-                }
-            ]
+
+
+<!-- Strategy -->
+<div id="strategy">
+    <h2>Trump's Four-Point Inflation Plan</h2>
+    <p>Trump plans to end inflation using these strategies:</p>
+    <h2>1. Lower taxes within America's borders, incentivizing companies to operate locally.</h2>
+    <!-- Chart -->
+    <div class="dashboard" id="chart">
+        <canvas id="inflationChart"></canvas>
+    </div>
+    <p>Trump's plan economic explanation</p>
+    <h2>2. Raise tariffs to generate revenue and encourage American manufacturing.</h2>
+    <p>Trump's plan economic explanation</p>
+    <h2>3. Increase domestic oil production to reduce energy costs.</h2>
+    <p>Trump's plan economic explanation</p>
+</div>
+
+
+<div id="details">
+    <h4>Background on Inflation Trends</h4>
+    <p>The Consumer Price Index (CPI) measures the 12-month percent change in prices for goods and services.</p>
+</div>
+
+</div> <!-- CLOSE main -->
+
+<script>
+const labels = [
+    'Dec 2020–Dec 2021',
+    'Dec 2021–Dec 2022',
+    'Dec 2022–Dec 2023',
+    'Dec 2023–Dec 2024',
+    'Dec 2024–Dec 2025'
+];
+
+// CPI data
+const cpiData = {
+    "Beverage materials including coffee and tea": [3.9, 13.8, 0.3, 3.5, 11.8],
+    "Utility (piped) gas service": [24.1, 19.3, -13.8, 4.9, 10.8],
+    "Fuel oil": [41.0, 41.5, -14.7, -13.1, 7.4],
+    "Tobacco and smoking products": [9.0, 5.5, 7.8, 6.7, 6.8],
+    "All items": [7.0, 6.5, 3.4, 2.9, 2.7]
+};
+
+const colors = [
+    'rgba(31,78,121,1)',
+    'rgba(244,67,54,1)',
+    'rgba(76,175,80,1)',
+    'rgba(255,193,7,1)',
+    'rgba(156,39,176,1)'
+];
+
+// Initialize Chart
+const ctx = document.getElementById('inflationChart').getContext('2d');
+
+const inflationChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: []
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: '12-Month Percent Change in CPI for Selected Items'
+            },
+            legend: {
+                position: 'top'
+            }
         },
-        options: {
-            responsive: true,
-            plugins: {
+        scales: {
+            y: {
+                beginAtZero: false,
                 title: {
                     display: true,
-                    text: '12-Month Percent Change in CPI for Selected Items'
-                },
-                legend: {
-                    position: 'top'
+                    text: 'Percent Change (%)'
                 }
             },
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    title: {
-                        display: true,
-                        text: 'Percent Change (%)'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Year Range'
-                    }
+            x: {
+                title: {
+                    display: true,
+                    text: 'Year Range'
                 }
             }
         }
-    });
+    }
+});
+
+// Add checkboxes dynamically
+const checkboxContainer = document.getElementById('checkboxes');
+
+Object.keys(cpiData).forEach((category, i) => {
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+
+    checkbox.type = 'checkbox';
+    checkbox.value = category;
+    checkbox.checked = i < 3;
+    checkbox.addEventListener('change', updateChart);
+
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(" " + category));
+    checkboxContainer.appendChild(label);
+});
+
+function updateChart() {
+    const selected = Array.from(
+        checkboxContainer.querySelectorAll('input:checked')
+    ).map(cb => cb.value);
+
+    inflationChart.data.datasets = selected.map((category, index) => ({
+        label: category,
+        data: cpiData[category],
+        borderColor: colors[index % colors.length],
+        backgroundColor: colors[index % colors.length].replace('1)', '0.2)'),
+        fill: true,
+        tension: 0.4
+    }));
+
+    inflationChart.update();
+}
+
+// Initial render
+updateChart();
 </script>
 
 </body>
