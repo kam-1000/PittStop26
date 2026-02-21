@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Politician Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<div class="topbar" id="topbar">Dashboard</div>
+
+<nav>
+    <div class="navLinks">
+        <a href="#">Dashboard</a>
+        <a href="#">Policy Search</a>
+        <a href="#">About Policies</a>
+        <a href="#">About Us</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-content">
+        <h1 id="heroName">Loading...</h1>
+        <p>Get to know this leader's history and policies</p>
+    </div>
+</section>
+
+<div id="main">
+
+    <h1>Executive Overview</h1>
+
+    <div class="dashboard">
+        <div class="card">
+            <h3>Position</h3>
+            <p id="cardPosition">—</p>
+        </div>
+        <div class="card">
+            <h3>Party</h3>
+            <p id="cardParty">—</p>
+        </div>
+        <div class="card">
+            <h3>Born</h3>
+            <p id="cardBorn">—</p>
+        </div>
+        <div class="card">
+            <h3>Other Roles</h3>
+            <p id="cardRoles">—</p>
+        </div>
+    </div>
+
+    <div id="biography" class="content-section">
+        <h2>Biography</h2>
+        <div id="biographyContent"></div>
+    </div>
+
+    <div id="economic" class="content-section">
+        <h2>Economic Policies</h2>
+        <ul id="economicList"></ul>
+    </div>
+
+    <div id="politics" class="content-section">
+        <h2>Political Priorities</h2>
+        <ul id="politicsList"></ul>
+    </div>
+
+</div>
+
+<script>
+    // Get the politician name from the URL, e.g. politician.html?name=Donald J. Trump
+    const params = new URLSearchParams(window.location.search);
+    const targetName = params.get('name');
+
+    fetch('politicians.csv')
+        .then(r => r.text())
+        .then(csv => {
+            const rows = parseCSV(csv);
+            const person = rows.find(r => r['Name'] === targetName) || rows[0];
+            populate(person);
+        })
+        .catch(err => console.error('Could not load CSV:', err));
+
+    function parseCSV(text) {
+        const lines = text.trim().split('\n');
+        const headers = lines[0].split(',').map(h => h.trim());
+        return lines.slice(1).map(line => {
+            // Handle commas inside quoted fields
+            const cols = [];
+            let cur = '', inQuotes = false;
+            for (let ch of line) {
+                if (ch === '"') inQuotes = !inQuotes;
+                else if (ch === ',' && !inQuotes) { cols.push(cur.trim()); cur = ''; }
+                else cur += ch;
+            }
+            cols.push(cur.trim());
+            return Object.fromEntries(headers.map((h, i) => [h, cols[i] || '']));
+        });
+    }
+
+    function populate(p) {
+        // Topbar and hero
+        document.title = p['Name'];
+        document.getElementById('topbar').textContent = p['Name'] + ' Dashboard';
+        document.getElementById('heroName').textContent = 'About ' + p['Name'];
+
+        // Cards
+        document.getElementById('cardPosition').textContent = p['Position'] || '—';
+        document.getElementById('cardParty').textContent = p['Party'] || '—';
+        document.getElementById('cardBorn').textContent = p['Born'] || '—';
+        document.getElementById('cardRoles').textContent = p['Other Roles'] || '—';
+
+        // Biography — split by | into separate paragraphs
+        const bioDiv = document.getElementById('biographyContent');
+        bioDiv.innerHTML = p['Biography']
+            .split('|')
+            .map(para => `<p>${para.trim()}</p>`)
+            .join('');
+
+        // Economic Policies — split by | into list items
+        const ecoList = document.getElementById('economicList');
+        ecoList.innerHTML = p['Economic Policies']
+            .split('|')
+            .map(item => `<li>${item.trim()}</li>`)
+            .join('');
+
+        // Political Priorities — split by | into list items
+        const polList = document.getElementById('politicsList');
+        polList.innerHTML = p['Political Priorities']
+            .split('|')
+            .map(item => `<li>${item.trim()}</li>`)
+            .join('');
+    }
+</script>
+
+</body>
+</html>
