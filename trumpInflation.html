@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trump - Inflation Analysis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f4f6f9;
+            color: #2c3e50;
+        }
+
+        /* Top Header */
+        .topbar {
+            background-color: #1f4e79;
+            color: white;
+            padding: 18px 30px;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Sidebar */
+        #mySidebar {
+            position: fixed;
+            left: 0;
+            top: 60px;
+            width: 240px;
+            height: 100%;
+            background-color: #ffffff;
+            border-right: 1px solid #e0e6ed;
+            padding-top: 20px;
+        }
+
+        #mySidebar a {
+            display: block;
+            padding: 14px 25px;
+            text-decoration: none;
+            color: #34495e;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
+
+        #mySidebar a:hover {
+            background-color: #e8f1fb;
+            color: #1f4e79;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        #main {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        canvas {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+    </style>
+
+    <!-- Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+    Trump - Inflation Analysis
+</div>
+
+<div id="mySidebar">
+    <a href="#chart">Inflation Chart</a>
+</div>
+
+<div id="main">
+    <h1>Consumer Price Index (CPI) Inflation Rates</h1>
+
+    <div class="dashboard">
+        <canvas id="inflationChart"></canvas>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('inflationChart').getContext('2d');
+
+    const inflationChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Dec 2020 to Dec 2021', 'Dec 2021 to Dec 2022', 'Dec 2022 to Dec 2023', 'Dec 2023 to Dec 2024', 'Dec 2024 to Dec 2025'],
+            datasets: [
+                {
+                    label: 'Beverage materials including coffee and tea',
+                    data: [3.9, 13.8, 0.3, 3.5, 11.8],
+                    borderColor: 'rgba(31,78,121,1)',
+                    backgroundColor: 'rgba(31,78,121,0.2)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Utility (piped) gas service',
+                    data: [24.1, 19.3, -13.8, 4.9, 10.8],
+                    borderColor: 'rgba(244, 67, 54, 1)',
+                    backgroundColor: 'rgba(244, 67, 54, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Fuel oil',
+                    data: [41.0, 41.5, -14.7, -13.1, 7.4],
+                    borderColor: 'rgba(76,175,80,1)',
+                    backgroundColor: 'rgba(76,175,80,0.2)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'All items',
+                    data: [7.0, 6.5, 3.4, 2.9, 2.7],
+                    borderColor: 'rgba(255, 193, 7,1)',
+                    backgroundColor: 'rgba(255, 193, 7,0.2)',
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: '12-Month Percent Change in CPI for Selected Items'
+                },
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Percent Change (%)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Year Range'
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
