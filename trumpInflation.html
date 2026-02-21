@@ -146,6 +146,15 @@ canvas {
 </head>
 <body>
 
+<!--TARIFF FILE-->
+    <input type="file" id="TBL-Data-Tariff-Effects-20260217.csv" accept=".csv" />
+    <table id="TBL-Data-Tariff-Effects-20260217.csv" border = "1">
+        <thead></thead>
+        <tbody></tbody>
+    </table>
+    <script src="script.js"></script>
+
+
 <div class="topbar">Financial Helper Dashboard</div>
 
 <div id="mySidebar">
@@ -209,11 +218,23 @@ canvas {
         </div>
         <p>
             <b>Economic Analysis:</b><br>
-
+            The GDP growth chart above shows the quarterly GDP growth rates from Q4 2021 (October-December 2021) to Q3 2025 (July-September 2025). The vertical dashed line indicates 
+            the implementation of Trump's One, Big, Beautiful Bill Act in Q1 2025. As shown on the chart, there is a very clear drop in GDP when the policy is implemented, followed
+            by an increase in GDP growth in the subsequent quarters. It is important also to note that the graph showss the GDP growth rates <i>in percentages</i>. This means that, 
+            when the policy was first implemented, the GDP decreased by -0.6%, bordering on a recession. While GDP is increasing in the following quarters, it is still below the 
+            pre-policy levels. This suggests that while there may be some positive impact from the policy, it has not yet fully reversed the initial decline in GDP. It is also
+            important to consider other factors that may have influenced GDP during this period, such as global economic conditions, consumer confidence, and other fiscal or 
+            monetary policies.
         </p>
 
     <h2>2. Raise tariffs to generate revenue and encourage American manufacturing.</h2>
     <p>Trump's plan economic explanation</p>
+    <h2>2. Raise tariffs to generate revenue and encourage American manufacturing.</h2>
+        <p>Trump's plan economic explanation</p>
+
+        <div class="dashboard">
+            <canvas id="tariffChart"></canvas>
+        </div>
     <h2>3. Increase domestic oil production to reduce energy costs.</h2>
     <p>Trump's plan economic explanation</p>
 </div>
@@ -325,18 +346,69 @@ const gdpData = [
 
 const gdpCtx = document.getElementById('gdpChart').getContext('2d');
 
+// Find index of Q1 25
+const policyIndex = gdpLabels.indexOf('Q1 25');
+
+// Vertical Line Plugin
+const verticalLinePlugin = {
+    id: 'verticalLinePlugin',
+    afterDraw(chart) {
+        const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+
+        const policyIndex = gdpLabels.indexOf('Q1 25');
+        const xPosition = x.getPixelForValue(policyIndex);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.setLineDash([6, 6]);
+        ctx.moveTo(xPosition, top);
+        ctx.lineTo(xPosition, bottom);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Label
+        ctx.fillStyle = 'rgba(0,0,0,0.8)';
+        ctx.font = '12px Segoe UI';
+        ctx.fillText('Policy Implementation', xPosition + 6, top + 15);
+
+        ctx.restore();
+    }
+};
+
 new Chart(gdpCtx, {
+    plugins: [verticalLinePlugin],
     type: 'line',
     data: {
         labels: gdpLabels,
         datasets: [{
             label: 'Quarterly GDP Growth (%)',
             data: gdpData,
-            borderColor: 'rgba(31,78,121,1)',
-            backgroundColor: 'rgba(31,78,121,0.2)',
             fill: true,
             tension: 0.3,
-            pointRadius: 4
+            pointRadius: 4,
+
+            // Dynamic segment coloring
+            segment: {
+                borderColor: ctx => {
+                    return ctx.p0DataIndex < policyIndex
+                        ? 'rgba(150,150,150,1)'   // Gray before Q1 25
+                        : 'rgba(31,78,121,1)';    // Blue Q1 25 and after
+                },
+                backgroundColor: ctx => {
+                    return ctx.p0DataIndex < policyIndex
+                        ? 'rgba(150,150,150,0.2)'
+                        : 'rgba(31,78,121,0.2)';
+                }
+            },
+
+            // Point colors
+            pointBackgroundColor: context => {
+                return context.dataIndex < policyIndex
+                    ? 'rgba(150,150,150,1)'
+                    : 'rgba(31,78,121,1)';
+            }
         }]
     },
     options: {
@@ -345,6 +417,9 @@ new Chart(gdpCtx, {
             title: {
                 display: true,
                 text: 'Quarterly GDP Growth Rate'
+            },
+            legend: {
+                display: false
             }
         },
         scales: {
@@ -357,6 +432,140 @@ new Chart(gdpCtx, {
         }
     }
 });
+
+document.getElementById('TBL-Data-Tariff-Effects-2026021.csv').addEventListener('change', handFileSelect, false);
+function handleFileSelect(event){
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e)
+    {
+        const csvData = e.target.results;
+        displayAsTable(csvData);
+    };
+
+    reader.readAsText(file);
+}
+
+function displayAsTable(csv)
+{
+    const lines = csv.split('\\n');
+    const tableHead = document.querySelector('#TBL-Data-Tariff-Effects-20260217.csv thead');
+    const tableBody = document.querySelector('#TBL-Data-Tariff-Effects-20260217.csv tbody');
+
+    tableHead.innerHTML = '';
+    tableBody.innerHTML = '';
+
+    const headers = lines[0].split(',');
+    let headerRow = '<tr>';
+        headers.forEach(header => {
+            headerRow += `<th>${header}</th>`;
+        });
+    headerRow += '</tr>';
+    tableHead.innerHTML = headerRow;
+
+    for(let i = 1; i<lines.length; i++)
+    {
+        const cells = lines[i].split(',');
+        if (cells.length === headers.length)
+    {
+        let row = '<tr>';
+            cells.forEach(cell => {
+                row += `<td>${cell}</td>`;
+            });
+        row += '</tr>';
+        tableBody.innerHTML += row;
+    }
+    }
+}
+
+</script>
+<script>
+let tariffChart;
+
+// Parse CSV into usable arrays
+function parseTariffCSV(csvText) {
+    const rows = csvText.trim().split('\n');
+    const headers = rows[0].split(',');
+
+    const yearIndex = headers.indexOf('Date');
+    const tariffIndex = headers.indexOf('Customs duties (nominal USD)');
+
+    const labels = [];
+    const tariffValues = [];
+
+    for (let i = 1; i < rows.length; i++) {
+        const cols = rows[i].split(',');
+        labels.push(cols[yearIndex]);
+        tariffValues.push(parseFloat(cols[tariffIndex]));
+    }
+
+    return { labels, tariffValues };
+}
+
+// Create chart
+function renderTariffChart(data) {
+    const ctx = document.getElementById('tariffChart').getContext('2d');
+
+    if (tariffChart) tariffChart.destroy();
+
+    tariffChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: 'Average U.S. Tariff Rate (%)',
+                data: data.tariffValues,
+                borderColor: 'rgba(31,78,121,1)',
+                backgroundColor: 'rgba(31,78,121,0.2)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'U.S. Tariff Rates Over Time'
+                },
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Tariff Rate (%)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Hook into existing file upload
+document.getElementById('TBL-Data-Tariff-Effects-20260217.csv')
+    .addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const csvText = e.target.result;
+            const parsedData = parseTariffCSV(csvText);
+            renderTariffChart(parsedData);
+        };
+
+        reader.readAsText(file);
+    });
 </script>
 
 </body>
