@@ -1,11 +1,174 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Home Page</title>
-         <link rel="stylesheet" href="homePage.css">
-         <body>
-            <h1>TEST</h1>
-         </body>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background-color: #f4f6f9;
+        color: #2c3e50;
+    }
+
+    /* Top Header */
+    .topbar {
+        background-color: #1f4e79;
+        color: white;
+        padding: 18px 30px;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Sidebar */
+    #mySidebar {
+        position: fixed;
+        left: 0;
+        top: 60px;
+        width: 240px;
+        height: 100%;
+        background-color: #ffffff;
+        border-right: 1px solid #e0e6ed;
+        padding-top: 20px;
+    }
+
+    #mySidebar a {
+        display: block;
+        padding: 14px 25px;
+        text-decoration: none;
+        color: #34495e;
+        font-size: 14px;
+        transition: 0.2s ease;
+    }
+
+    #mySidebar a:hover {
+        background-color: #e8f1fb;
+        color: #1f4e79;
+        font-weight: 500;
+    }
+
+    /* Main Content */
+    #main {
+        margin-left: 240px;
+        padding: 30px;
+    }
+
+    /* Dashboard Grid */
+    .dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .card {
+        background-color: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .card h3 {
+        margin: 0 0 10px 0;
+        font-size: 16px;
+        color: #6c7a89;
+    }
+
+    .card p {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0;
+        color: #1f4e79;
+    }
+
+    /* Content Section */
+    .content-section {
+        background-color: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        line-height: 1.6;
+    }
+
+    .content-section h2 {
+        margin-top: 0;
+        color: #1f4e79;
+    }
+</style>
+
+    <link rel="stylesheet" href="homePage.css">
+</head>
+
+<body>
+
+<div class="topbar">
+    Financial Helper Dashboard
+</div>
+
+<div id="mySidebar">
+    <a href="#">Dashboard</a>
+    <a href="#">Search Politicians</a>
+    <a href="#">Policy Database</a>
+    <a href="#">Comparative Analysis</a>
+    <a href="#">Create Custom Report</a>
+    <a href="#">Saved Analyses</a>
+</div>
+
+<div id="main">
+
+    <h1>Executive Overview</h1>
+
+    <div class="dashboard">
+        <div class="card">
+            <h3>Total Policies Tracked</h3>
+            <p>128</p>
+        </div>
+
+        <div class="card">
+            <h3>Politicians Analyzed</h3>
+            <p>54</p>
+        </div>
+
+        <div class="card">
+            <h3>Active Financial Reports</h3>
+            <p>16</p>
+        </div>
+
+        <div class="card">
+            <h3>Economic Risk Index</h3>
+            <p>Moderate</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Platform Summary</h2>
+
+        <p>
+            Financial Helper provides structured financial and policy analysis
+            designed for researchers, analysts, and informed voters.
+            Our platform tracks economic legislation, fiscal proposals,
+            and policy impacts across multiple sectors including taxation,
+            healthcare, infrastructure, and national budgeting.
+        </p>
+
+        <p>
+            The dashboard above highlights key system metrics including
+            tracked policy volume, comparative political analysis coverage,
+            and report generation statistics. These metrics update dynamically
+            as new legislative data and financial records are processed.
+        </p>
+
+        <p>
+            Use the navigation menu to explore in-depth economic modeling,
+            policy comparisons, and custom financial simulations tailored
+            to specific demographic or macroeconomic scenarios.
+        </p>
+    </div>
+
+</div>
+
+</body>
 </html>
