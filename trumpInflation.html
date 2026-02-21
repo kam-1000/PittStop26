@@ -146,12 +146,6 @@ canvas {
 </head>
 <body>
 
-<!--TARIFF FILE-->
-    <input type="file" id="TBL-Data-Tariff-Effects-20260217.csv" accept=".csv" />
-    <table id="TBL-Data-Tariff-Effects-20260217.csv" border = "1">
-        <thead></thead>
-        <tbody></tbody>
-    </table>
     <script src="script.js"></script>
 
 
@@ -226,9 +220,6 @@ canvas {
             important to consider other factors that may have influenced GDP during this period, such as global economic conditions, consumer confidence, and other fiscal or 
             monetary policies.
         </p>
-
-    <h2>2. Raise tariffs to generate revenue and encourage American manufacturing.</h2>
-    <p>Trump's plan economic explanation</p>
     <h2>2. Raise tariffs to generate revenue and encourage American manufacturing.</h2>
         <p>Trump's plan economic explanation</p>
 
@@ -433,15 +424,22 @@ new Chart(gdpCtx, {
     }
 });
 
-document.getElementById('TBL-Data-Tariff-Effects-2026021.csv').addEventListener('change', handFileSelect, false);
+document.getElementById('tariffFileInput')
+  .addEventListener('change', handleFileSelect, false);
+
 function handleFileSelect(event){
+    console.log("Tariff file selected");
     const file = event.target.files[0];
     const reader = new FileReader();
 
     reader.onload = function(e)
     {
-        const csvData = e.target.results;
+        console.log("CSV loaded");
+        const csvData = e.target.result;
         displayAsTable(csvData);
+
+        const parsed = parseTariffCSV(csvData);
+        renderTariffChart(parsed);
     };
 
     reader.readAsText(file);
@@ -449,9 +447,9 @@ function handleFileSelect(event){
 
 function displayAsTable(csv)
 {
-    const lines = csv.split('\\n');
-    const tableHead = document.querySelector('#TBL-Data-Tariff-Effects-20260217.csv thead');
-    const tableBody = document.querySelector('#TBL-Data-Tariff-Effects-20260217.csv tbody');
+    const lines = csv.trim().split(/\r?\n/);
+    const tableHead = document.querySelector('#tariffTable thead');
+    const tableBody = document.querySelector('#tariffTable tbody');
 
     tableHead.innerHTML = '';
     tableBody.innerHTML = '';
@@ -538,7 +536,7 @@ function renderTariffChart(data) {
                 y: {
                     title: {
                         display: true,
-                        text: 'Tariff Rate (%)'
+                        text: 'Customs Duties (nominal USD)'
                     }
                 },
                 x: {
@@ -552,20 +550,78 @@ function renderTariffChart(data) {
     });
 }
 
-// Hook into existing file upload
-document.getElementById('TBL-Data-Tariff-Effects-20260217.csv')
-    .addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
+</script>
 
-        reader.onload = function (e) {
-            const csvText = e.target.result;
-            const parsedData = parseTariffCSV(csvText);
-            renderTariffChart(parsedData);
-        };
+<script>
+/* =========================
+   TARIFF DATA (EMBEDDED)
+========================= */
 
-        reader.readAsText(file);
-    });
+const tariffLabels = [
+  "Jan-20","Feb-20","Mar-20","Apr-20","May-20","Jun-20","Jul-20","Aug-20","Sep-20","Oct-20","Nov-20","Dec-20",
+  "Jan-21","Feb-21","Mar-21","Apr-21","May-21","Jun-21","Jul-21","Aug-21","Sep-21","Oct-21","Nov-21","Dec-21",
+  "Jan-22","Feb-22","Mar-22","Apr-22","May-22","Jun-22","Jul-22","Aug-22","Sep-22","Oct-22","Nov-22","Dec-22",
+  "Jan-23","Feb-23","Mar-23","Apr-23","May-23","Jun-23","Jul-23","Aug-23","Sep-23","Oct-23","Nov-23","Dec-23",
+  "Jan-24","Feb-24","Mar-24","Apr-24","May-24","Jun-24","Jul-24","Aug-24","Sep-24","Oct-24","Nov-24","Dec-24",
+  "Jan-25","Feb-25","Mar-25","Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26"
+];
+
+const tariffValues = [
+  6918,6286,4815,4114,3833,4480,5013,5896,6049,6156,5965,6047,
+  5871,6323,6275,7128,6433,7150,7509,7270,7857,7770,7816,8187,
+  8587,8049,8151,9162,8095,8364,8530,8456,8741,8163,7171,6552,
+  6838,6349,6152,6350,6373,6475,6910,6325,6678,6903,6296,5744,
+  6477,6208,6064,6367,5225,6323,7133,7047,7249,7297,6712,6814,
+  7341,7247,8168,15634,22173,26632,27670,29503,29675,31354,30756,27892,27742
+];
+
+/* =========================
+   TARIFF CHART
+========================= */
+
+const tariffCtx = document.getElementById('tariffChart').getContext('2d');
+
+new Chart(tariffCtx, {
+  type: 'line',
+  data: {
+    labels: tariffLabels,
+    datasets: [{
+      label: 'Customs Duties (Nominal USD)',
+      data: tariffValues,
+      borderColor: 'rgba(31,78,121,1)',
+      backgroundColor: 'rgba(31,78,121,0.2)',
+      fill: true,
+      tension: 0.35,
+      pointRadius: 2
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: {
+        display: true,
+        text: 'U.S. Customs Duties Collected Over Time'
+      },
+      legend: {
+        display: false
+      }
+    },
+    scales: {
+      y: {
+        title: {
+          display: true,
+          text: 'Nominal USD (Millions)'
+        }
+      },
+      x: {
+        ticks: {
+          maxRotation: 45,
+          minRotation: 45
+        }
+      }
+    }
+  }
+});
 </script>
 
 </body>
