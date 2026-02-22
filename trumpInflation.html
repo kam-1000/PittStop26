@@ -5,79 +5,9 @@
 <title>Trump - Inflation Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<link rel="stylesheet" href="styles.css">
+
 <style>
-body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    background-color: #f4f6f9;
-    color: #2c3e50;
-}
-
-/* Top Header */
-.topbar {
-    background-color: #1f4e79;
-    color: white;
-    padding: 18px 30px;
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-}
-
-/* Sidebar */
-#mySidebar {
-    position: fixed;
-    left: 0;
-    top: 60px;
-    width: 240px;
-    height: calc(100% - 60px);
-    background-color: #ffffff;
-    border-right: 1px solid #e0e6ed;
-    padding-top: 20px;
-    overflow-y: auto;
-}
-
-#mySidebar a {
-    display: block;
-    padding: 14px 25px;
-    text-decoration: none;
-    color: #34495e;
-    font-size: 14px;
-    transition: 0.2s ease;
-}
-
-#mySidebar a:hover {
-    background-color: #e8f1fb;
-    color: #1f4e79;
-    font-weight: 500;
-}
-
-/* Main Content */
-#main {
-    margin-left: 240px;
-    padding: 100px 40px 40px 40px;
-}
-
-h1 {
-    color: #1f4e79;
-    margin-bottom: 20px;
-}
-
-h2 {
-    color: #1f4e79;
-    margin-top: 25px;
-    margin-bottom: 10px;
-}
-
-p {
-    margin-bottom: 15px;
-    line-height: 1.6;
-}
-
 /* Dashboard Chart */
 .dashboard {
     display: grid;
@@ -130,8 +60,8 @@ canvas {
     margin-bottom: 30px;
 }
 .checkbox-container label {
-    display: block;
-    margin-bottom: 8px;
+    display: inline-flex; align-items: center; gap: 6px;
+    margin: 4px 12px 4px 0; font-size: 13px; color: #444; cursor: pointer;
 }
 
 .dashboard {
@@ -149,13 +79,26 @@ canvas {
     <script src="script.js"></script>
 
 
-<div class="topbar">Financial Helper Dashboard</div>
-
-<div id="mySidebar">
-    <a href="#chart">Inflation Chart</a>
-    <a href="#strategy">Trump's Plan</a>
-    <a href="#details">Additional Info</a>
+<div class="topbar">
+    Economics Explorer
 </div>
+
+<nav>
+    <div class="navLinks">
+    <a href="Homepage.html">Dashboard</a>
+    <a href="LocationPicker.html">Policy Search</a>
+    <a href="#">Policy Wiki</a>
+    <a href="#">About Us</a>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+       <h1>Trump's Inflation Policy</h1>
+        <p>What is its effect?</p>
+    </div>
+</section>
 
 <div id="main">
 <h1>Donald J. Trump - Inflation Dashboard</h1>
