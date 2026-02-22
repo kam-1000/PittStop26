@@ -6,7 +6,6 @@
   <title>Location Picker</title>
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* Dropdown */
     .dropdown-wrapper { position: relative; }
     .search-box {
       display: flex; align-items: center; background: white;
@@ -27,29 +26,36 @@
     .arrow { color: #aaa; font-size: 11px; margin-left: 8px; transition: transform 0.2s; }
     .search-box.open .arrow { transform: rotate(180deg); }
 
+    /* Scrollable dropdown */
     .dropdown-menu {
       display: none; position: absolute;
-      top: calc(100% + 6px); left: 0; right: 0;
+      top: calc(100% + 6px); left: 0; right: 0; 
       background: white; border: 1.5px solid #d0d7de;
       border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.1);
       overflow: hidden; z-index: 100;
     }
     .dropdown-menu.open { display: block; }
+    .dropdown-search {
+      padding: 10px 12px; border-bottom: 1px solid #f0f2f5;
+    }
+    .dropdown-search input {
+      width: 100%; border: 1.5px solid #d0d7de; border-radius: 8px;
+      padding: 8px 12px; font-size: 13px; outline: none; color: #2c3e50;
+    }
+    .dropdown-search input:focus { border-color: #1f4e79; }
+    .dropdown-list { max-height: 225px; overflow-y: auto; padding-bottom: 10px;}
 
     .flat-item {
-      padding: 12px 16px; font-size: 13.5px; color: #34495e;
+      padding: 11px 16px; font-size: 13.5px; color: #34495e;
       cursor: pointer; border-bottom: 1px solid #f0f2f5;
       display: flex; align-items: center; gap: 10px; transition: background 0.15s;
     }
     .flat-item:last-child { border-bottom: none; }
     .flat-item:hover { background: #eef4fb; color: #1f4e79; }
     .flat-item.selected { background: #1f4e79; color: white; }
-    .flat-item .item-icon { font-size: 16px; flex-shrink: 0; }
     .flat-item .item-label { flex: 1; }
-    .flat-item .item-desc { font-size: 11px; opacity: 0.65; }
 
-    /* Toggle */
-    .toggle-group { display: flex; background: #f0f5fb; border-radius: 10px; padding: 4px; gap: 4px; margin-bottom: 4px; }
+    .toggle-group { display: flex; background: #f0f5fb; border-radius: 10px; padding: 4px; gap: 4px; }
     .toggle-btn {
       flex: 1; padding: 10px; border: none; background: transparent;
       border-radius: 8px; font-size: 14px; font-weight: 500; color: #555;
@@ -58,21 +64,17 @@
     .toggle-btn.active { background: #1f4e79; color: white; box-shadow: 0 2px 8px rgba(31,78,121,0.2); }
     .toggle-btn:hover:not(.active) { background: #e0ecf8; color: #1f4e79; }
 
-
-    /* Go button */
     .go-btn {
       display: flex; align-items: center; justify-content: center; gap: 10px;
-      margin: 25px 0;
-      padding: 14px; background: #1f4e79; color: white;
+      margin: 25px 0; padding: 14px; background: #1f4e79; color: white;
       border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
       cursor: pointer; text-decoration: none;
       box-shadow: 0 4px 12px rgba(31,78,121,0.25);
-      opacity: 0; pointer-events: none;
-      transform: translateY(8px);
+      opacity: 0; pointer-events: none; transform: translateY(8px);
       transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s;
     }
     .go-btn.visible { opacity: 1; pointer-events: all; transform: translateY(0); }
-    .go-btn:hover { background: #163d61; box-shadow: 0 6px 16px rgba(31,78,121,0.35); }
+    .go-btn:hover { background: #163d61; }
     .go-btn:active { transform: scale(0.98); }
 
     .country-display {
@@ -82,30 +84,31 @@
       font-size: 14px; color: #1f4e79; font-weight: 500;
     }
     .country-display .flag { font-size: 20px; }
+
+    .loading-msg { font-size: 13px; color: #aaa; padding: 12px 16px; text-align: center; }
   </style>
 </head>
 <body>
 
-<div class="topbar">Location Picker</div>
+<div class="topbar">Economics Explorer</div>
 
 <nav>
   <div class="navLinks">
     <a href="Homepage.html">Dashboard</a>
     <a href="LocationPicker.html">Policy Search</a>
-    <a href="#">About Policies</a>
+    <a href="#">Policy Wiki</a>
     <a href="#">About Us</a>
   </div>
 </nav>
 
+<section class="hero">
+  <div class="hero-content">
+    <h1>Choose Your Location</h1>
+    <p>National, State, or County</p>
+  </div>
+</section>
+
 <div id="main">
-
-  <section class="hero">
-    <div class="hero-content">
-      <h1>Choose Your Location</h1>
-      <p>National, State, or County</p>
-    </div>
-  </section>
-
   <section class="content-section">
     <h2>Select Your Location</h2>
     <p class="subtitle">Choose national, state, or county level to view local data.</p>
@@ -116,21 +119,15 @@
       <div class="field-group">
         <div class="field-label">Search Type</div>
         <div class="toggle-group">
-          <button class="toggle-btn active" id="btnPolicy" onclick="setSearchType('policy')">
-            📋 Policies
-          </button>
-          <button class="toggle-btn" id="btnPolitician" onclick="setSearchType('politician')">
-            🗣️ Politicians
-          </button>
+          <button class="toggle-btn active" id="btnPolicy" onclick="setSearchType('policy')">📋 Policies</button>
+          <button class="toggle-btn" id="btnPolitician" onclick="setSearchType('politician')">🗣️ Politicians</button>
         </div>
       </div>
 
       <!-- Country (fixed) -->
       <div class="field-group">
         <div class="field-label">Country <span style="color:#aaa;font-weight:400;text-transform:none;font-size:11px;">(default)</span></div>
-        <div class="country-display">
-          <span class="flag">🇺🇸</span> United States
-        </div>
+        <div class="country-display"><span class="flag">🇺🇸</span> United States</div>
       </div>
 
       <!-- State dropdown -->
@@ -143,21 +140,15 @@
             <span class="arrow">▼</span>
           </div>
           <div class="dropdown-menu" id="menu1">
-            <div class="flat-item" onclick="selectState('georgia', 'Georgia', ['Fulton County','DeKalb County','Gwinnett County','Cobb County','Cherokee County'])">
-              <div class="item-label">Georgia</div>
+            <div class="dropdown-search">
+              <input type="text" id="stateSearch" placeholder="Search states..." oninput="filterList('stateSearch', 'stateList')" onclick="event.stopPropagation()" />
             </div>
-            <div class="flat-item" onclick="selectState('california', 'California', ['Los Angeles County','San Francisco County','San Diego County','Sacramento County'])">
-              <div class="item-label">California</div>
-            </div>
-            <div class="flat-item" onclick="selectState('texas', 'Texas', ['Harris County','Dallas County','Travis County','Bexar County'])">
-              <div class="item-label">Texas</div>
-            </div>
-            <div class="flat-item" onclick="selectState('new-york', 'New York', ['New York County','Kings County','Queens County','Bronx County'])">
-              <div class="item-label">New York</div>
+            <div class="dropdown-list" id="stateList">
+              <div class="loading-msg">Loading states...</div>
             </div>
           </div>
         </div>
-      </div>
+      </div>              
 
       <!-- County dropdown -->
       <div class="field-group">
@@ -168,11 +159,16 @@
             <input type="text" id="input2" placeholder="Select a state first..." readonly />
             <span class="arrow">▼</span>
           </div>
-          <div class="dropdown-menu" id="menu2"></div>
+          <div class="dropdown-menu" id="menu2">
+            <div class="dropdown-search">
+              <input type="text" id="countySearch" placeholder="Search counties..." oninput="filterList('countySearch', 'countyList')" onclick="event.stopPropagation()" />
+            </div>
+            <div class="dropdown-list" id="countyList"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Navigation button -->
+      <!-- Go button -->
       <a class="go-btn" id="goBtn" href="#">
         <span id="btnText">View National Policies</span>
         <span>→</span>
@@ -180,21 +176,78 @@
 
     </div>
   </section>
-
 </div>
+
+  <div class="page-footer">        <!-- ← here -->
+    State and County data provided by <a href="https://simplemaps.com/data/us-counties" target="_blank">simplemaps.com</a>
+  </div>
 
 <script>
   let selState = null, selCounty = null, searchType = 'policy';
+  let stateCountyMap = {}; // { "Georgia": ["Fulton County", ...], ... }
 
-  function setSearchType(type) {
-    searchType = type;
-    document.getElementById('btnPolicy').classList.toggle('active', type === 'policy');
-    document.getElementById('btnPolitician').classList.toggle('active', type === 'politician');
-    updateBtn();
+  // ── Load CSV ──
+  fetch('uscounties.csv')
+    .then(r => r.text())
+    .then(csv => {
+      parseCountyCSV(csv);
+      buildStateList();
+    })
+    .catch(() => {
+      document.getElementById('stateList').innerHTML =
+        '<div class="loading-msg">⚠️ Could not load counties CSV. Make sure uscounties.csv is in the same folder.</div>';
+    });
+
+  function parseCountyCSV(text) {
+    const lines = text.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+    const countyIdx = headers.indexOf('county_full');
+    const stateIdx  = headers.indexOf('state_name');
+
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(',').map(c => c.replace(/"/g, '').trim());
+      const county = cols[countyIdx];
+      const state  = cols[stateIdx];
+      if (!county || !state) continue;
+      if (!stateCountyMap[state]) stateCountyMap[state] = [];
+      if (!stateCountyMap[state].includes(county)) stateCountyMap[state].push(county);
+    }
+
+    // Sort states and counties alphabetically
+    Object.keys(stateCountyMap).forEach(s => stateCountyMap[s].sort());
   }
 
+  function buildStateList() {
+    const list = document.getElementById('stateList');
+    const states = Object.keys(stateCountyMap).sort();
+    list.innerHTML = states.map(s => `
+      <div class="flat-item" onclick="selectState('${s.toLowerCase().replace(/ /g, '-')}', '${s}')">
+        <div class="item-label">${s}</div>
+      </div>`
+    ).join('');
+  }
+
+  function buildCountyList(state) {
+    const list = document.getElementById('countyList');
+    const counties = stateCountyMap[state] || [];
+    list.innerHTML = counties.map(c => `
+      <div class="flat-item" onclick="selectCounty(this, '${c.replace(/'/g, "\\'")}')">
+        <div class="item-label">${c}</div>
+      </div>`
+    ).join('');
+  }
+
+  // ── Filter search inside dropdown ──
+  function filterList(searchId, listId) {
+    const q = document.getElementById(searchId).value.toLowerCase();
+    document.querySelectorAll(`#${listId} .flat-item`).forEach(item => {
+      item.style.display = item.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  // ── Dropdown toggle ──
   function toggleDropdown(n) {
-    const box = document.getElementById(`searchBox${n}`);
+    const box  = document.getElementById(`searchBox${n}`);
     const menu = document.getElementById(`menu${n}`);
     if (box.classList.contains('disabled')) return;
     const isOpen = menu.classList.contains('open');
@@ -203,32 +256,31 @@
   }
 
   function closeAll() {
-    [1,2].forEach(n => {
+    [1, 2].forEach(n => {
       document.getElementById(`menu${n}`).classList.remove('open');
       document.getElementById(`searchBox${n}`).classList.remove('open');
     });
+    // Clear search inputs when closing
+    const ss = document.getElementById('stateSearch');
+    const cs = document.getElementById('countySearch');
+    if (ss) { ss.value = ''; filterList('stateSearch', 'stateList'); }
+    if (cs) { cs.value = ''; filterList('countySearch', 'countyList'); }
   }
 
-  function selectState(key, label, counties) {
+  // ── Selections ──
+  function selectState(key, label) {
     selState = key;
     selCounty = null;
 
     document.getElementById('input1').value = label;
-    document.querySelectorAll('#menu1 .flat-item').forEach(i => i.classList.remove('selected'));
+    document.querySelectorAll('#stateList .flat-item').forEach(i => i.classList.remove('selected'));
     event.currentTarget.classList.add('selected');
 
-    const box2 = document.getElementById('searchBox2');
-    const menu2 = document.getElementById('menu2');
-    box2.classList.remove('disabled');
+    // Enable county dropdown
+    document.getElementById('searchBox2').classList.remove('disabled');
     document.getElementById('input2').value = '';
     document.getElementById('input2').placeholder = 'Select a county...';
-
-    menu2.innerHTML = counties.map(c =>
-      `<div class="flat-item" onclick="selectCounty(this, '${c}')">
-        <span class="item-icon">📍</span>
-        <div class="item-label">${c}</div>
-      </div>`
-    ).join('');
+    buildCountyList(label);
 
     updateBtn();
     closeAll();
@@ -237,17 +289,26 @@
   function selectCounty(el, label) {
     selCounty = label;
     document.getElementById('input2').value = label;
-    document.querySelectorAll('#menu2 .flat-item').forEach(i => i.classList.remove('selected'));
+    document.querySelectorAll('#countyList .flat-item').forEach(i => i.classList.remove('selected'));
     el.classList.add('selected');
     updateBtn();
     closeAll();
   }
 
+  // ── Search type toggle ──
+  function setSearchType(type) {
+    searchType = type;
+    document.getElementById('btnPolicy').classList.toggle('active', type === 'policy');
+    document.getElementById('btnPolitician').classList.toggle('active', type === 'politician');
+    updateBtn();
+  }
+
+  // ── Go button ──
   function updateBtn() {
     const btn = document.getElementById('goBtn');
     const txt = document.getElementById('btnText');
     const typeLabel = searchType === 'policy' ? 'Policies' : 'Politicians';
-    const typePage = searchType === 'policy' ? 'PolicySearch' : 'PoliticianSearch';
+    const typePage  = searchType === 'policy' ? 'PolicySearch' : 'PoliticianSearch';
 
     if (selCounty) {
       txt.textContent = `View ${selCounty} ${typeLabel}`;
@@ -259,13 +320,10 @@
       txt.textContent = `View National ${typeLabel}`;
       btn.href = `${typePage}.html`;
     }
-
     btn.classList.add('visible');
   }
 
-  window.addEventListener('load', () => {
-    updateBtn();
-  });
+  window.addEventListener('load', updateBtn);
 
   document.addEventListener('click', e => {
     if (!document.querySelector('.form-wrapper').contains(e.target)) closeAll();
