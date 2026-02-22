@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Policy Search</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-header { margin-bottom: 24px; }
+    .page-header h1 { color: #1f4e79; font-size: 1.6rem; margin-bottom: 4px; }
+    .page-header p { color: #888; font-size: 14px; }
+
+    /* Search bar */
+    .search-bar {
+      display: flex; align-items: center; gap: 10px;
+      background: white; border: 1.5px solid #d0d7de; border-radius: 10px;
+      padding: 12px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      margin-bottom: 16px; transition: border-color 0.2s;
+    }
+    .search-bar:focus-within { border-color: #1f4e79; box-shadow: 0 0 0 3px rgba(31,78,121,0.1); }
+    .search-bar input { border: none; outline: none; width: 100%; font-size: 14px; color: #2c3e50; }
+    .search-bar .search-icon { color: #aaa; font-size: 16px; }
+    .clear-btn { background: none; border: none; color: #aaa; cursor: pointer; font-size: 16px; padding: 0; display: none; }
+    .clear-btn.visible { display: block; }
+
+    /* Filters */
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .filter-chip {
+      padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: 1.5px solid #d0d7de; background: white;
+      color: #555; transition: all 0.15s;
+    }
+    .filter-chip:hover { border-color: #2e75b6; color: #1f4e79; background: #eef4fb; }
+    .filter-chip.active { background: #1f4e79; color: white; border-color: #1f4e79; }
+
+    /* Results info */
+    .results-info { font-size: 13px; color: #888; margin-bottom: 16px; }
+    .results-info span { font-weight: 600; color: #1f4e79; }
+
+    /* Policy cards */
+    .policy-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .policy-card {
+      background: white; border-radius: 12px; padding: 22px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1.5px solid #eef0f3;
+      transition: box-shadow 0.2s, border-color 0.2s; cursor: pointer;
+    }
+    .policy-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); border-color: #c8ddf0; }
+
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
+    .card-title { font-size: 20px; font-weight: 600; color: #1f4e79; }
+    .card-badge {
+      font-size: 11px; font-weight: 600; padding: 4px 10px;
+      border-radius: 20px; white-space: nowrap; flex-shrink: 0;
+    }
+    .badge-tax { background: #fff3cd; color: #856404; }
+    .badge-healthcare { background: #d1ecf1; color: #0c5460; }
+    .badge-education { background: #d4edda; color: #155724; }
+    .badge-infrastructure { background: #e2d9f3; color: #4a235a; }
+    .badge-environment { background: #d4f1e4; color: #145a32; }
+    .badge-housing { background: #fde8d8; color: #7d3c00; }
+    .badge-publicsafety { background: #fadadd; color: #7b241c; }
+
+    .card-meta { font-size: 12px; color: #aaa; margin-bottom: 10px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .card-meta span { display: flex; align-items: center; gap: 4px; }
+    .card-desc { font-size: 13.5px; color: #555; line-height: 1.6; }
+
+    .view-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 12px; font-size: 13px; font-weight: 600;
+      color: #1f4e79; text-decoration: none;
+    }
+    .view-link:hover { text-decoration: underline; }
+
+    .no-results { text-align: center; padding: 60px 20px; color: #aaa; }
+    .no-results .icon { font-size: 40px; margin-bottom: 12px; }
+    .no-results p { font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">Policy Search</div>
+
+<nav>
+  <div class="navLinks">
+    <a href="Homepage.html">Dashboard</a>
+    <a href="LocationPicker.html">Policy Search</a>
+    <a href="#">About Policies</a>
+    <a href="#">About Us</a>
+  </div>
+</nav>
+
+<div id="main">
+
+  <section class="hero">
+    <div class="hero-content">
+      <h1 id="heroTitle">Policy Database</h1>
+      <p id="heroSub">Browse and search policies across the United States</p>
+    </div>
+  </section>
+
+    <div style="max-width: 860px; margin: 30px auto;">
+
+    <div class="page-header">
+      <h1 id="pageHeader">National Policies</h1>
+      <p id="locationLabel">Showing policies for: <strong>United States</strong></p>
+    </div>
+
+    <!-- Search bar -->
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search policies by keyword..." oninput="handleSearch()" />
+      <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
+    </div>
+
+    <!-- Category filters -->
+    <div class="filters">
+      <div class="filter-chip active" onclick="toggleFilter(this, 'all')">All</div>
+      <div class="filter-chip" onclick="toggleFilter(this, 'tax')">💰 Tax</div>
+      <div class="filter-chip" onclick="toggleFilter(this, 'healthcare')">🏥 Healthcare</div>
+      <div class="filter-chip" onclick="toggleFilter(this, 'education')">🎓 Education</div>
+      <div class="filter-chip" onclick="toggleFilter(this, 'infrastructure')">🏗️ Infrastructure</div>
+      <div class="filter-chip" onclick="toggleFilter(this, 'environment')">🌿 Environment</div>
+      <div class="filter-chip" onclick="toggleFilter(this, 'housing')">🏠 Housing</div>
+      <div class="filter-chip" onclick="toggleFilter(this, 'publicsafety')">🛡️ Public Safety</div>
+    </div>
+
+    <div class="results-info">Showing <span id="resultCount">0</span> policies</div>
+
+    <div class="policy-list" id="policyList"></div>
+
+  </div>
+</div>
+
+<script>
+  const policies = [
+    {
+      title: "Federal Tax Cuts and Jobs Act Extension",
+      category: "tax", location: "National", date: "Jan 2025", author: "U.S. Congress",
+      desc: "Proposes extending the individual income tax cuts from the 2017 Tax Cuts and Jobs Act, which are set to expire. Includes provisions for reduced marginal rates for middle-income earners and adjustments to the standard deduction."
+    },
+    {
+      title: "Affordable Care Act Medicaid Expansion",
+      category: "healthcare", location: "National", date: "Mar 2024", author: "Dept. of Health & Human Services",
+      desc: "Expands Medicaid eligibility to cover more low-income adults in states that have not yet adopted expansion, with the federal government funding 90% of the additional costs."
+    },
+    {
+      title: "Student Loan Relief and Repayment Reform",
+      category: "education", location: "National", date: "Aug 2024", author: "Dept. of Education",
+      desc: "Introduces a new income-driven repayment plan that caps monthly payments at 5% of discretionary income for undergraduate loans and provides forgiveness after 10 years for borrowers with small loan balances."
+    },
+    {
+      title: "Bipartisan Infrastructure Investment Act",
+      category: "infrastructure", location: "National", date: "Nov 2023", author: "U.S. Congress",
+      desc: "Allocates $1.2 trillion toward rebuilding roads, bridges, and broadband infrastructure. Includes dedicated funding for public transit upgrades and electric vehicle charging networks."
+    },
+    {
+      title: "Clean Energy Transition Tax Credit",
+      category: "environment", location: "National", date: "Feb 2024", author: "Dept. of Energy",
+      desc: "Provides tax credits to households and businesses that invest in solar panels, heat pumps, and electric vehicles. Part of a broader initiative to reduce national carbon emissions by 50% by 2030."
+    },
+    {
+      title: "Georgia Workforce Housing Initiative",
+      category: "housing", location: "Georgia", date: "Jun 2024", author: "Governor's Office",
+      desc: "Creates a $500 million state fund to incentivize developers to build affordable workforce housing in high-cost metro areas including Atlanta, Savannah, and Augusta."
+    },
+    {
+      title: "Atlanta One Safe City Initiative",
+      category: "publicsafety", location: "Georgia", date: "Jan 2023", author: "Mayor's Office, Atlanta",
+      desc: "A comprehensive public safety plan for the City of Atlanta that includes establishing a Nightlife Division, expanding the Office of Violence Reduction, and installing 30,000 LED street lights across the city."
+    },
+    {
+      title: "Georgia Broadband Expansion Act",
+      category: "infrastructure", location: "Georgia", date: "Apr 2024", author: "Georgia General Assembly",
+      desc: "Provides $250 million in grants to expand high-speed internet access to rural Georgia communities, targeting areas where fewer than 25% of residents currently have access to broadband."
+    },
+    {
+      title: "National Clean Air Standards Update",
+      category: "environment", location: "National", date: "Sep 2024", author: "Environmental Protection Agency",
+      desc: "Updates the National Ambient Air Quality Standards for fine particulate matter, lowering the annual standard from 12 to 9 micrograms per cubic meter to better protect public health in urban areas."
+    },
+    {
+      title: "Georgia Education Funding Reform",
+      category: "education", location: "Georgia", date: "Mar 2024", author: "Georgia General Assembly",
+      desc: "Revises the state's Quality Basic Education formula to better account for students with special needs, English language learners, and students in poverty, ensuring more equitable distribution of education funding across districts."
+    }
+  ];
+
+  let activeFilter = 'all', searchQuery = '';
+
+  const params = new URLSearchParams(window.location.search);
+  const state = params.get('state');
+  const county = params.get('county');
+
+  let locationLabel = 'United States';
+  if (county) locationLabel = decodeURIComponent(county);
+  else if (state) locationLabel = state.charAt(0).toUpperCase() + state.slice(1).replace(/-/g, ' ');
+
+  document.getElementById('pageHeader').textContent = `${locationLabel} Policies`;
+  document.getElementById('heroSub').textContent = `Browse and search policies for ${locationLabel}`;
+  document.getElementById('locationLabel').innerHTML = `Showing policies for: <strong>${locationLabel}</strong>`;
+
+  function toggleFilter(el, cat) {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    activeFilter = cat;
+    render();
+  }
+
+  function handleSearch() {
+    searchQuery = document.getElementById('searchInput').value.toLowerCase();
+    document.getElementById('clearBtn').classList.toggle('visible', searchQuery.length > 0);
+    render();
+  }
+
+  function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    searchQuery = '';
+    document.getElementById('clearBtn').classList.remove('visible');
+    render();
+  }
+
+  function render() {
+    const list = document.getElementById('policyList');
+    const filtered = policies.filter(p => {
+      const matchCat = activeFilter === 'all' || p.category === activeFilter;
+      const matchSearch = !searchQuery ||
+        p.title.toLowerCase().includes(searchQuery) ||
+        p.desc.toLowerCase().includes(searchQuery) ||
+        p.category.toLowerCase().includes(searchQuery) ||
+        p.author.toLowerCase().includes(searchQuery);
+      return matchCat && matchSearch;
+    });
+
+    document.getElementById('resultCount').textContent = filtered.length;
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="no-results"><div class="icon">🔍</div><p>No policies found matching your search.</p></div>`;
+      return;
+    }
+
+    const badgeMap = { tax:'badge-tax', healthcare:'badge-healthcare', education:'badge-education', infrastructure:'badge-infrastructure', environment:'badge-environment', housing:'badge-housing', publicsafety:'badge-publicsafety' };
+    const labelMap = { tax:'💰 Tax', healthcare:'🏥 Healthcare', education:'🎓 Education', infrastructure:'🏗️ Infrastructure', environment:'🌿 Environment', housing:'🏠 Housing', publicsafety:'🛡️ Public Safety' };
+
+    list.innerHTML = filtered.map(p => `
+      <div class="policy-card">
+        <div class="card-top">
+          <div class="card-title">${p.title}</div>
+          <span class="card-badge ${badgeMap[p.category]}">${labelMap[p.category]}</span>
+        </div>
+        <div class="card-meta">
+          <span>📍 ${p.location}</span>
+          <span>📅 ${p.date}</span>
+          <span>👤 ${p.author}</span>
+        </div>
+        <div class="card-desc">${p.desc}</div>
+      </div>
+    `).join('');
+  }
+
+  render();
+</script>
+
+</body>
+</html>
