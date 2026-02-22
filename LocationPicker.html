@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Picker</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Dropdown */
+    .dropdown-wrapper { position: relative; }
+    .search-box {
+      display: flex; align-items: center; background: white;
+      border: 1.5px solid #d0d7de; border-radius: 10px;
+      padding: 12px 16px; cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .search-box:hover:not(.disabled) { border-color: #2e75b6; }
+    .search-box.open { border-color: #1f4e79; box-shadow: 0 0 0 3px rgba(31,78,121,0.1); }
+    .search-box.disabled { background: #f5f6f8; cursor: not-allowed; opacity: 0.55; }
+    .search-box input {
+      border: none; outline: none; width: 100%;
+      font-size: 14px; color: #2c3e50; background: transparent; cursor: pointer;
+    }
+    .search-box.disabled input { cursor: not-allowed; }
+    .dd-icon { font-size: 16px; margin-right: 10px; }
+    .arrow { color: #aaa; font-size: 11px; margin-left: 8px; transition: transform 0.2s; }
+    .search-box.open .arrow { transform: rotate(180deg); }
+
+    .dropdown-menu {
+      display: none; position: absolute;
+      top: calc(100% + 6px); left: 0; right: 0;
+      background: white; border: 1.5px solid #d0d7de;
+      border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      overflow: hidden; z-index: 100;
+    }
+    .dropdown-menu.open { display: block; }
+
+    .flat-item {
+      padding: 12px 16px; font-size: 13.5px; color: #34495e;
+      cursor: pointer; border-bottom: 1px solid #f0f2f5;
+      display: flex; align-items: center; gap: 10px; transition: background 0.15s;
+    }
+    .flat-item:last-child { border-bottom: none; }
+    .flat-item:hover { background: #eef4fb; color: #1f4e79; }
+    .flat-item.selected { background: #1f4e79; color: white; }
+    .flat-item .item-icon { font-size: 16px; flex-shrink: 0; }
+    .flat-item .item-label { flex: 1; }
+    .flat-item .item-desc { font-size: 11px; opacity: 0.65; }
+
+    /* Toggle */
+    .toggle-group { display: flex; background: #f0f5fb; border-radius: 10px; padding: 4px; gap: 4px; margin-bottom: 4px; }
+    .toggle-btn {
+      flex: 1; padding: 10px; border: none; background: transparent;
+      border-radius: 8px; font-size: 14px; font-weight: 500; color: #555;
+      cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .toggle-btn.active { background: #1f4e79; color: white; box-shadow: 0 2px 8px rgba(31,78,121,0.2); }
+    .toggle-btn:hover:not(.active) { background: #e0ecf8; color: #1f4e79; }
+
+
+    /* Go button */
+    .go-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin: 25px 0;
+      padding: 14px; background: #1f4e79; color: white;
+      border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      box-shadow: 0 4px 12px rgba(31,78,121,0.25);
+      opacity: 0; pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 0.25s ease, transform 0.25s ease, background 0.2s;
+    }
+    .go-btn.visible { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .go-btn:hover { background: #163d61; box-shadow: 0 6px 16px rgba(31,78,121,0.35); }
+    .go-btn:active { transform: scale(0.98); }
+
+    .country-display {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; background: #f0f5fb;
+      border: 1.5px solid #c8ddf0; border-radius: 10px;
+      font-size: 14px; color: #1f4e79; font-weight: 500;
+    }
+    .country-display .flag { font-size: 20px; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">Location Picker</div>
+
+<nav>
+  <div class="navLinks">
+    <a href="Homepage.html">Dashboard</a>
+    <a href="LocationPicker.html">Policy Search</a>
+    <a href="#">About Policies</a>
+    <a href="#">About Us</a>
+  </div>
+</nav>
+
+<div id="main">
+
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Choose Your Location</h1>
+      <p>National, State, or County</p>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <h2>Select Your Location</h2>
+    <p class="subtitle">Choose national, state, or county level to view local data.</p>
+
+    <div class="form-wrapper">
+
+      <!-- Search Type Toggle -->
+      <div class="field-group">
+        <div class="field-label">Search Type</div>
+        <div class="toggle-group">
+          <button class="toggle-btn active" id="btnPolicy" onclick="setSearchType('policy')">
+            📋 Policies
+          </button>
+          <button class="toggle-btn" id="btnPolitician" onclick="setSearchType('politician')">
+            🗣️ Politicians
+          </button>
+        </div>
+      </div>
+
+      <!-- Country (fixed) -->
+      <div class="field-group">
+        <div class="field-label">Country <span style="color:#aaa;font-weight:400;text-transform:none;font-size:11px;">(default)</span></div>
+        <div class="country-display">
+          <span class="flag">🇺🇸</span> United States
+        </div>
+      </div>
+
+      <!-- State dropdown -->
+      <div class="field-group">
+        <div class="field-label">State <span style="color:#aaa;font-weight:400;text-transform:none;font-size:11px;">(optional)</span></div>
+        <div class="dropdown-wrapper">
+          <div class="search-box" id="searchBox1" onclick="toggleDropdown(1)">
+            <span class="dd-icon">🏛️</span>
+            <input type="text" id="input1" placeholder="Select a state..." readonly />
+            <span class="arrow">▼</span>
+          </div>
+          <div class="dropdown-menu" id="menu1">
+            <div class="flat-item" onclick="selectState('georgia', 'Georgia', ['Fulton County','DeKalb County','Gwinnett County','Cobb County','Cherokee County'])">
+              <div class="item-label">Georgia</div>
+            </div>
+            <div class="flat-item" onclick="selectState('california', 'California', ['Los Angeles County','San Francisco County','San Diego County','Sacramento County'])">
+              <div class="item-label">California</div>
+            </div>
+            <div class="flat-item" onclick="selectState('texas', 'Texas', ['Harris County','Dallas County','Travis County','Bexar County'])">
+              <div class="item-label">Texas</div>
+            </div>
+            <div class="flat-item" onclick="selectState('new-york', 'New York', ['New York County','Kings County','Queens County','Bronx County'])">
+              <div class="item-label">New York</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- County dropdown -->
+      <div class="field-group">
+        <div class="field-label">County <span style="color:#aaa;font-weight:400;text-transform:none;font-size:11px;">(optional)</span></div>
+        <div class="dropdown-wrapper">
+          <div class="search-box disabled" id="searchBox2" onclick="toggleDropdown(2)">
+            <span class="dd-icon">📍</span>
+            <input type="text" id="input2" placeholder="Select a state first..." readonly />
+            <span class="arrow">▼</span>
+          </div>
+          <div class="dropdown-menu" id="menu2"></div>
+        </div>
+      </div>
+
+      <!-- Navigation button -->
+      <a class="go-btn" id="goBtn" href="#">
+        <span id="btnText">View National Policies</span>
+        <span>→</span>
+      </a>
+
+    </div>
+  </section>
+
+</div>
+
+<script>
+  let selState = null, selCounty = null, searchType = 'policy';
+
+  function setSearchType(type) {
+    searchType = type;
+    document.getElementById('btnPolicy').classList.toggle('active', type === 'policy');
+    document.getElementById('btnPolitician').classList.toggle('active', type === 'politician');
+    updateBtn();
+  }
+
+  function toggleDropdown(n) {
+    const box = document.getElementById(`searchBox${n}`);
+    const menu = document.getElementById(`menu${n}`);
+    if (box.classList.contains('disabled')) return;
+    const isOpen = menu.classList.contains('open');
+    closeAll();
+    if (!isOpen) { menu.classList.add('open'); box.classList.add('open'); }
+  }
+
+  function closeAll() {
+    [1,2].forEach(n => {
+      document.getElementById(`menu${n}`).classList.remove('open');
+      document.getElementById(`searchBox${n}`).classList.remove('open');
+    });
+  }
+
+  function selectState(key, label, counties) {
+    selState = key;
+    selCounty = null;
+
+    document.getElementById('input1').value = label;
+    document.querySelectorAll('#menu1 .flat-item').forEach(i => i.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+
+    const box2 = document.getElementById('searchBox2');
+    const menu2 = document.getElementById('menu2');
+    box2.classList.remove('disabled');
+    document.getElementById('input2').value = '';
+    document.getElementById('input2').placeholder = 'Select a county...';
+
+    menu2.innerHTML = counties.map(c =>
+      `<div class="flat-item" onclick="selectCounty(this, '${c}')">
+        <span class="item-icon">📍</span>
+        <div class="item-label">${c}</div>
+      </div>`
+    ).join('');
+
+    updateBtn();
+    closeAll();
+  }
+
+  function selectCounty(el, label) {
+    selCounty = label;
+    document.getElementById('input2').value = label;
+    document.querySelectorAll('#menu2 .flat-item').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+    updateBtn();
+    closeAll();
+  }
+
+  function updateBtn() {
+    const btn = document.getElementById('goBtn');
+    const txt = document.getElementById('btnText');
+    const typeLabel = searchType === 'policy' ? 'Policies' : 'Politicians';
+    const typePage = searchType === 'policy' ? 'PolicySearch' : 'PoliticianSearch';
+
+    if (selCounty) {
+      txt.textContent = `View ${selCounty} ${typeLabel}`;
+      btn.href = `${typePage}.html?county=${encodeURIComponent(selCounty)}&state=${selState}`;
+    } else if (selState) {
+      txt.textContent = `View ${document.getElementById('input1').value} ${typeLabel}`;
+      btn.href = `${typePage}.html?state=${selState}`;
+    } else {
+      txt.textContent = `View National ${typeLabel}`;
+      btn.href = `${typePage}.html`;
+    }
+
+    btn.classList.add('visible');
+  }
+
+  window.addEventListener('load', () => {
+    updateBtn();
+  });
+
+  document.addEventListener('click', e => {
+    if (!document.querySelector('.form-wrapper').contains(e.target)) closeAll();
+  });
+</script>
+
+</body>
+</html>
