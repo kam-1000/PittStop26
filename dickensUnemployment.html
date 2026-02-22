@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dickens - Unemployment Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f9;
+    color: #2c3e50;
+}
+
+/* Top Header */
+.topbar {
+    background-color: #1f4e79;
+    color: white;
+    padding: 18px 30px;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Sidebar */
+#mySidebar {
+    position: fixed;
+    left: 0;
+    top: 60px;
+    width: 240px;
+    height: calc(100% - 60px);
+    background-color: #ffffff;
+    border-right: 1px solid #e0e6ed;
+    padding-top: 20px;
+    overflow-y: auto;
+}
+
+#mySidebar a {
+    display: block;
+    padding: 14px 25px;
+    text-decoration: none;
+    color: #34495e;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+#mySidebar a:hover {
+    background-color: #e8f1fb;
+    color: #1f4e79;
+    font-weight: 500;
+}
+
+/* Main Content */
+#main {
+    margin-left: 240px;
+    padding: 100px 40px 40px 40px;
+}
+
+h1 {
+    color: #1f4e79;
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #1f4e79;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* Dashboard Chart */
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+canvas {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Info Boxes */
+.info-boxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.info-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.info-box h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #6c7a89;
+}
+
+.info-box p {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f4e79;
+}
+
+/* Checkbox Container */
+.checkbox-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+.checkbox-container label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin: 20px 0 40px 0;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <script src="script.js"></script>
+
+
+<div class="topbar">Financial Helper Dashboard</div>
+
+<div id="mySidebar">
+    <a href="#chart">Unemployment Chart</a>
+    <a href="#strategy">Dickens' Plan</a>
+    <a href="#details">Additional Info</a>
+</div>
+
+<div id="main">
+<h1>Dickens - Unemployment Dashboard</h1>
+
+<div id="details">
+    <h4>Background on Unemployment Trends</h4>
+    <p>
+        Unemployment rates are a critical indicator of economic health and can be influenced by various factors including economic policies, 
+        market conditions, and external events. In Atlanta, the unemployment rate has seen fluctuations over the past few years, with periods 
+        of both improvement and challenges. Understanding these trends is essential for evaluating the effectiveness of policy interventions and 
+        planning future strategies to promote job growth and economic stability.
+    </p>
+    <h4>General Analysis</h4>
+    <p>
+        Overall, unemployment has shown a fluctuating trend over the past few years, with periods of both improvement and challenges. 
+        The data indicates that while there have been efforts to reduce unemployment, external factors and economic conditions have influenced the overall trend. <br><br>
+         <i>Scroll down for a more in-depth analysis of Dickens' unemployment strategies.</i>
+    </p>
+</div>
+
+<!-- Info Boxes -->
+<div class="info-boxes">
+    <div class="info-box">
+        <h3>Focus Area</h3>
+        <p>Workforce Development, Youth Employment, and Supporting Local Businesses</p>
+    </div>
+    <div class="info-box">
+        <h3>Target</h3>
+        <p>Stimulate economic growth and create job opportunities in Atlanta</p>
+    </div>
+    <div class="info-box">
+        <h3>Major Policies</h3>
+        <p> SYEP, Investments in Development, and Support Systems</p>
+    </div>
+</div>
+
+<h2>Unemployment Rate</h2>
+<canvas id="unemploymentChart" width="600" height="400"></canvas>
+<p>
+    The chart above shows the unemployment rate in Atlanta from January 2023 to June 2025. The data indicates that the unemployment rate has fluctuated between 3.0% and 
+    3.9% during this period, with a general trend of slight increases in the latter half of 2024 and early 2025. This trend may be influenced by various economic factors, 
+    including changes in the housing market, local economic conditions, and broader national economic trends. <br><br>
+
+</p>
+
+<!-- Strategy -->
+<div id="strategy">
+    <h2>Dickens' Housing Plan</h2>
+        <p>Dickens plans to improve housing using these strategies:</p>
+    <h2>1. Mayor's Summer Youth Employment Program</h2>
+        <p>
+            The Mayor's Summer Youth Employment Program (SYEP) is a key initiative aimed at providing job opportunities for young people in Atlanta. By offering summer employment, 
+            the program helps to develop skills, build work experience, and foster economic engagement among youth. This strategy not only addresses unemployment but also contributes to 
+            long-term economic growth by preparing the next generation of workers for success in the job market.
+        </p>
+    <h2>2. Investments in Workforce Development</h2>
+        <p>
+            Dickens has also focused on investing in workforce development programs that provide training and support for job seekers. These investments include partnerships with local businesses, 
+            educational institutions, and community organizations to create pathways to employment. By enhancing the skills of the workforce and connecting job seekers with opportunities, these efforts aim to 
+            reduce unemployment and promote economic stability in Atlanta.
+        </p>
+</div>
+
+</div> <!-- CLOSE main -->
+
+<script>
+const ctx = document.getElementById('unemploymentChart').getContext('2d');
+
+const unemploymentData = {
+    labels: [
+        'Jan 23','Feb 23','Mar 23','Apr 23','May 23','Jun 23','Jul 23',
+        'Aug 23','Sep 23','Oct 23','Nov 23','Dec 23',
+        'Jan 24','Feb 24','Mar 24','Apr 24','May 24','Jun 24',
+        'Jul 24','Aug 24','Sep 24','Oct 24','Nov 24','Dec 24',
+        'Jan 25','Feb 25','Mar 25','Apr 25','May 25','Jun 25',
+        'Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25'
+    ],
+    datasets: [{
+        label: 'Unemployment Rate (%)',
+        data: [
+            3.3,3.3,3.2,2.7,3.3,3.5,3.2,3.6,3.2,3.3,3.0,3.0,
+            3.3,3.3,3.3,3.0,3.4,3.8,3.7,3.9,3.4,3.5,3.4,3.3,
+            3.4,3.6,3.6,3.0,3.3,3.6,3.5,3.5,3.4,3.4,3.9,3.3
+        ],
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        fill: true,
+        tension: 0.3
+    }]
+};
+
+new Chart(ctx, {
+    type: 'line',
+    data: unemploymentData,
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+
+</body>
+</html>
