@@ -5,6 +5,36 @@
     <title>Politician Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
+    <style>
+       #economic {
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1.5px solid transparent;
+}
+
+#economic:hover {
+    border-color: #c8ddf0;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+#economic:hover h2 {
+    color: #2e75b6;
+}
+
+#economic::after {
+    content: 'View Full Analysis →';
+    display: block;
+    margin-top: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2e75b6;
+}
+
+#economic:hover::after {
+    color: #1f4e79;
+}
+    </style>
 </head>
 
 <body>
@@ -117,19 +147,23 @@
             .map(para => `<p>${para.trim()}</p>`)
             .join('');
 
-        // Economic Policies — split by | into list items
-        const ecoList = document.getElementById('economicList');
-        ecoList.innerHTML = p['Economic Policies']
-            .split('|')
-            .map(item => `<li>${item.trim()}</li>`)
-            .join('');
+        // Economic Policies — entire section is one clickable card
+const ecoSection = document.getElementById('economic');
+ecoSection.onclick = () => window.location = 'trumpInflation.html';
 
+const ecoList = document.getElementById('economicList');
+ecoList.innerHTML = p['Economic Policies']
+    .split('|')
+    .map(item => `<li>${item.trim()}</li>`)
+    .join('');
         // Political Priorities — split by | into list items
         const polList = document.getElementById('politicsList');
         polList.innerHTML = p['Political Priorities']
             .split('|')
             .map(item => `<li>${item.trim()}</li>`)
             .join('');
+
+        //
     }
 </script>
 
