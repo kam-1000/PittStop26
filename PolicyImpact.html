@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Policy Impact</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .section-block {
+      background: white; border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 28px 32px; margin-bottom: 28px;
+    }
+    .section-block h2 {
+      color: #1f4e79; font-size: 1.2rem;
+      margin: 0 0 6px; padding-bottom: 10px;
+      border-bottom: 2px solid #e8f1fb;
+    }
+    .section-block p { color: #555; line-height: 1.7; margin: 10px 0 0; font-size: 14px; }
+
+    .side-toggle { display: flex; gap: 12px; margin-bottom: 28px; }
+    .side-btn {
+      flex: 1; padding: 14px; border: 2px solid #d0d7de;
+      border-radius: 12px; background: white; cursor: pointer;
+      font-size: 14px; font-weight: 600; color: #555;
+      transition: all 0.2s; text-align: center;
+    }
+    .side-btn:hover { border-color: #2e75b6; color: #1f4e79; }
+    .side-btn.active-pro { background: #e8f5e9; border-color: #28a745; color: #155724; }
+    .side-btn.active-con { background: #fce8e8; border-color: #dc3545; color: #7b241c; }
+    .side-btn.active-both { background: #e8f1fb; border-color: #1f4e79; color: #1f4e79; }
+
+    .graphs-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 20px; margin-bottom: 28px;
+    }
+    @media (max-width: 768px) { .graphs-grid { grid-template-columns: 1fr; } }
+
+    .graph-panel {
+      background: white; border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;
+    }
+    .graph-header {
+      padding: 16px 20px 12px; border-bottom: 1px solid #f0f2f5;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .graph-header.pro { border-left: 4px solid #28a745; }
+    .graph-header.con { border-left: 4px solid #dc3545; }
+    .graph-header h3 { font-size: 14px; font-weight: 700; color: #1f4e79; margin: 0; flex: 1; }
+    .badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+    .badge-pro { background: #e8f5e9; color: #155724; }
+    .badge-con { background: #fce8e8; color: #7b241c; }
+
+    .graph-body { padding: 16px 20px 20px; }
+    .graph-desc { font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 16px; }
+    .chart-wrapper { background: #f8fafc; border-radius: 8px; padding: 16px; border: 1px solid #e8f1fb; }
+    .legend { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+    .legend-line { width: 24px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+    .legend-dashed { width: 24px; height: 0; border-top: 3px dashed #aaa; flex-shrink: 0; }
+
+    .info-boxes {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px; margin-bottom: 28px;
+    }
+    .info-box {
+      background: white; padding: 20px 22px; border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid #1f4e79;
+    }
+    .info-box h3 { margin: 0 0 6px; font-size: 12px; color: #6c7a89; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-box p  { margin: 0; font-size: 15px; font-weight: 600; color: #1f4e79; }
+
+    .location-banner {
+      background: #e8f1fb; border: 1.5px solid #c8ddf0; border-radius: 10px;
+      padding: 12px 18px; margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; color: #1f4e79; font-weight: 500;
+    }
+    .location-banner a { color: #2e75b6; font-size: 13px; margin-left: auto; text-decoration: none; }
+    .location-banner a:hover { text-decoration: underline; }
+
+    #main h1 { color: #1f4e79; font-size: 1.6rem; margin-bottom: 6px; }
+    #main .subtitle { color: #888; font-size: 14px; margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">Economics Explorer</div>
+
+<nav>
+  <div class="navLinks">
+    <a href="Homepage.html">Dashboard</a>
+    <a href="LocationPicker.html">Policy Search</a>
+    <a href="#">Policy Wiki</a>
+    <a href="#">About Us</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <h1>Minimum Wage Increase</h1>
+    <p id="heroSub">Analyzing the economic impact from both sides</p>
+  </div>
+</section>
+
+<div id="main">
+
+  <h1>Policy Impact Analysis</h1>
+  <p class="subtitle">Each graph shows the projected effect of the policy (solid line) against the status quo if no policy is enacted (dashed line).</p>
+
+  <!-- Location banner -->
+  <div class="location-banner" id="locationBanner">
+    📍 <span id="locationText">United States (National)</span>
+    <a href="LocationPicker.html">Change location →</a>
+  </div>
+
+  <!-- Info boxes -->
+  <div class="info-boxes">
+    <div class="info-box">
+      <h3>Policy</h3>
+      <p>Federal Minimum Wage Increase</p>
+    </div>
+    <div class="info-box">
+      <h3>Proposed Change</h3>
+      <p>$7.25 → $15.00/hr</p>
+    </div>
+    <div class="info-box">
+      <h3>Implementation</h3>
+      <p>Phased over 5 years</p>
+    </div>
+    <div class="info-box">
+      <h3>Affected Workers</h3>
+      <p id="affectedWorkers">~17 million</p>
+    </div>
+  </div>
+
+  <!-- Side toggle -->
+  <div class="side-toggle">
+    <button class="side-btn active-both" id="btnBoth" onclick="setView('both')">📊 Both Sides</button>
+    <button class="side-btn" id="btnPro"  onclick="setView('pro')">✅ Supporting View</button>
+    <button class="side-btn" id="btnCon"  onclick="setView('con')">❌ Opposing View</button>
+  </div>
+
+  <!-- Graphs -->
+  <div class="graphs-grid" id="graphsGrid">
+
+    <div class="graph-panel" id="proPanel1">
+      <div class="graph-header pro">
+        <h3>Average Low-Wage Worker Income</h3>
+        <span class="badge badge-pro">✅ Supporting</span>
+      </div>
+      <div class="graph-body">
+        <p class="graph-desc" id="proDesc1"></p>
+        <div class="chart-wrapper"><canvas id="proChart1"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-line" style="background:#28a745"></div> With policy</div>
+          <div class="legend-item"><div class="legend-dashed"></div> Status quo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="graph-panel" id="conPanel1">
+      <div class="graph-header con">
+        <h3>Small Business Employment</h3>
+        <span class="badge badge-con">❌ Opposing</span>
+      </div>
+      <div class="graph-body">
+        <p class="graph-desc" id="conDesc1"></p>
+        <div class="chart-wrapper"><canvas id="conChart1"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-line" style="background:#dc3545"></div> With policy</div>
+          <div class="legend-item"><div class="legend-dashed"></div> Status quo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="graph-panel" id="proPanel2">
+      <div class="graph-header pro">
+        <h3>Workers Below Poverty Line</h3>
+        <span class="badge badge-pro">✅ Supporting</span>
+      </div>
+      <div class="graph-body">
+        <p class="graph-desc" id="proDesc2"></p>
+        <div class="chart-wrapper"><canvas id="proChart2"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-line" style="background:#28a745"></div> With policy</div>
+          <div class="legend-item"><div class="legend-dashed"></div> Status quo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="graph-panel" id="conPanel2">
+      <div class="graph-header con">
+        <h3>Consumer Price Index (Low-Income Goods)</h3>
+        <span class="badge badge-con">❌ Opposing</span>
+      </div>
+      <div class="graph-body">
+        <p class="graph-desc" id="conDesc2"></p>
+        <div class="chart-wrapper"><canvas id="conChart2"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-line" style="background:#dc3545"></div> With policy</div>
+          <div class="legend-item"><div class="legend-dashed"></div> Status quo</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-block">
+    <h2>Summary</h2>
+    <p id="summaryText"></p>
+  </div>
+
+</div>
+
+<script>
+  // ── Read location from URL ──
+  const params = new URLSearchParams(window.location.search);
+  const stateParam  = params.get('state');
+  const countyParam = params.get('county');
+
+  let locationName = 'United States';
+  let locationType = 'national'; // 'national' | 'state' | 'county'
+
+  if (countyParam) {
+    locationName = decodeURIComponent(countyParam);
+    locationType = 'county';
+  } else if (stateParam) {
+    locationName = stateParam.charAt(0).toUpperCase() + stateParam.slice(1).replace(/-/g, ' ');
+    locationType = 'state';
+  }
+
+  document.getElementById('heroSub').textContent  = `Analyzing the impact for ${locationName}`;
+  document.getElementById('locationText').textContent = `📍 ${locationName}`;
+
+  // ── Location-specific data ──
+  // Each location profile contains data arrays and descriptive text.
+  // statusQuo is the baseline trajectory without the policy.
+  // withPolicy is the projected trajectory with the policy enacted.
+
+  const years = ['2024','2025','2026','2027','2028','2029'];
+
+  const locationData = {
+    national: {
+      affectedWorkers: '~17 million',
+      pro1: {
+        statusQuo:  [26.0, 26.5, 27.0, 27.5, 28.0, 28.5],
+        withPolicy: [26.0, 27.8, 29.5, 31.2, 33.0, 34.8],
+        desc: 'Nationally, supporters project a significant income boost for low-wage workers as the minimum wage phases in, with annual earnings rising by roughly $8,000 over five years for full-time minimum wage workers.'
+      },
+      con1: {
+        statusQuo:  [100, 101, 102, 103, 104, 105],
+        withPolicy: [100,  99,  97,  95,  93,  91],
+        desc: 'Nationally, critics warn that higher labor costs could reduce small business employment by an estimated 1.3 million jobs, with the effects concentrated in low-margin sectors like retail and food service.'
+      },
+      pro2: {
+        statusQuo:  [13.2, 13.0, 12.8, 12.6, 12.5, 12.4],
+        withPolicy: [13.2, 12.4, 11.3, 10.1,  9.2,  8.5],
+        desc: 'Proponents project a meaningful reduction in the share of full-time workers living below the federal poverty line, with poverty rates among working adults potentially halving over the implementation period.'
+      },
+      con2: {
+        statusQuo:  [100, 102, 104, 106, 108, 110],
+        withPolicy: [100, 103, 107, 111, 115, 119],
+        desc: 'Opponents warn that businesses will pass increased labor costs on to consumers through higher prices, with low-income goods potentially rising 9% faster than baseline — disproportionately hurting the households the policy aims to help.'
+      },
+      summary: 'The national debate over the minimum wage increase reflects a fundamental tension in economic policy: the direct benefit to employed workers vs. potential costs to employment levels and consumer prices. Supporters emphasize the moral and economic case for a living wage and increased consumer spending power. Opponents raise concerns about job losses and inflation. The actual outcome depends heavily on how quickly businesses automate and how consumers respond to price changes.'
+    },
+
+    georgia: {
+      affectedWorkers: '~700,000',
+      pro1: {
+        statusQuo:  [24.5, 25.0, 25.5, 26.0, 26.5, 27.0],
+        withPolicy: [24.5, 26.5, 28.4, 30.2, 32.0, 33.8],
+        desc: 'Georgia has a high share of minimum wage workers, particularly in hospitality and agriculture. Supporters project income gains above the national average, as many Georgia workers are currently paid at or near the federal minimum.'
+      },
+      con1: {
+        statusQuo:  [100, 101, 102, 103, 104, 105],
+        withPolicy: [100,  98,  96,  93,  90,  88],
+        desc: 'Georgia\'s economy relies heavily on small businesses and low-margin hospitality jobs. Critics argue the state would see above-average job losses, particularly in rural counties where profit margins are thinner than in urban areas.'
+      },
+      pro2: {
+        statusQuo:  [15.1, 14.9, 14.7, 14.5, 14.3, 14.1],
+        withPolicy: [15.1, 14.0, 12.6, 11.1,  9.8,  8.7],
+        desc: 'Georgia has a higher share of workers below the poverty line than the national average. Proponents argue the wage increase would have an outsized positive impact on the state\'s working poor, particularly in metro Atlanta and rural south Georgia.'
+      },
+      con2: {
+        statusQuo:  [100, 102, 104, 106, 108, 110],
+        withPolicy: [100, 103, 107, 112, 117, 122],
+        desc: 'Georgia\'s reliance on food service and retail means consumer price increases could be steeper than the national average. Critics project prices on everyday goods rising 12% faster than the status quo trajectory by 2029.'
+      },
+      summary: 'In Georgia, the minimum wage debate is shaped by the state\'s large hospitality and agricultural sectors, its significant rural-urban divide, and a relatively high concentration of low-wage workers. The policy\'s benefits would be felt more strongly here than in higher-wage states, but so would the risks of job displacement, particularly in small towns and rural counties where local businesses have little capacity to absorb increased labor costs.'
+    },
+
+    default: {
+      affectedWorkers: 'Varies by area',
+      pro1: {
+        statusQuo:  [25.0, 25.5, 26.0, 26.5, 27.0, 27.5],
+        withPolicy: [25.0, 27.0, 29.0, 31.0, 32.8, 34.5],
+        desc: 'Local low-wage workers would see meaningful income gains as the minimum wage phases in, with the magnitude depending on the local share of minimum wage workers and the current local wage floor.'
+      },
+      con1: {
+        statusQuo:  [100, 101, 102, 103, 104, 105],
+        withPolicy: [100,  99,  97,  95,  93,  91],
+        desc: 'Local small businesses, particularly in retail and food service, may reduce headcount or hours in response to higher labor costs, with the impact depending heavily on the local competitive environment and business mix.'
+      },
+      pro2: {
+        statusQuo:  [13.5, 13.3, 13.1, 12.9, 12.7, 12.5],
+        withPolicy: [13.5, 12.6, 11.5, 10.3,  9.3,  8.6],
+        desc: 'The share of full-time local workers living below the poverty line is projected to fall significantly as wages rise, with the benefit concentrated among workers in retail, food service, and personal care services.'
+      },
+      con2: {
+        statusQuo:  [100, 102, 104, 106, 108, 110],
+        withPolicy: [100, 103, 107, 111, 115, 119],
+        desc: 'Local businesses may pass increased labor costs on to consumers, with price increases likely concentrated in restaurants, groceries, and personal services — the everyday purchases that matter most to low-income households.'
+      },
+      summary: 'The local impact of a minimum wage increase depends on the composition of the local economy, the existing wage distribution, and the capacity of local businesses to absorb higher labor costs. Areas with a higher share of minimum wage workers and lower-margin industries tend to see both larger benefits to workers and larger risks of job displacement and price increases.'
+    }
+  };
+
+  // Pick the right data profile
+  function getProfile() {
+    if (locationType === 'national') return locationData.national;
+    if (stateParam === 'georgia')    return locationData.georgia;
+    return locationData.default;
+  }
+
+  const profile = getProfile();
+  document.getElementById('affectedWorkers').textContent = profile.affectedWorkers;
+  document.getElementById('summaryText').textContent     = profile.summary;
+  document.getElementById('proDesc1').textContent        = profile.pro1.desc;
+  document.getElementById('conDesc1').textContent        = profile.con1.desc;
+  document.getElementById('proDesc2').textContent        = profile.pro2.desc;
+  document.getElementById('conDesc2').textContent        = profile.con2.desc;
+
+  // ── Build charts ──
+  let chartInstances = {};
+
+  function makeChart(id, statusQuo, withPolicy, color, yLabel) {
+    if (chartInstances[id]) chartInstances[id].destroy();
+    chartInstances[id] = new Chart(document.getElementById(id).getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: years,
+        datasets: [
+          {
+            label: 'Status Quo',
+            data: statusQuo,
+            borderColor: '#aaa',
+            borderDash: [6, 4],
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: '#aaa',
+            fill: false,
+            tension: 0.3
+          },
+          {
+            label: 'With Policy',
+            data: withPolicy,
+            borderColor: color,
+            backgroundColor: color.replace('1)', '0.08)'),
+            borderWidth: 2.5,
+            pointRadius: 4,
+            pointBackgroundColor: color,
+            fill: true,
+            tension: 0.3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          y: { title: { display: true, text: yLabel, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  makeChart('proChart1', profile.pro1.statusQuo, profile.pro1.withPolicy, 'rgba(40,167,69,1)',  'Annual Income ($000s)');
+  makeChart('conChart1', profile.con1.statusQuo, profile.con1.withPolicy, 'rgba(220,53,69,1)', 'Employment Index (2024 = 100)');
+  makeChart('proChart2', profile.pro2.statusQuo, profile.pro2.withPolicy, 'rgba(40,167,69,1)',  '% of Workers Below Poverty Line');
+  makeChart('conChart2', profile.con2.statusQuo, profile.con2.withPolicy, 'rgba(220,53,69,1)', 'Price Index (2024 = 100)');
+
+  // ── View toggle ──
+  function setView(view) {
+    ['proPanel1','proPanel2','conPanel1','conPanel2'].forEach(id => {
+      document.getElementById(id).style.display = 'block';
+    });
+    if (view === 'pro') ['conPanel1','conPanel2'].forEach(id => document.getElementById(id).style.display = 'none');
+    if (view === 'con') ['proPanel1','proPanel2'].forEach(id => document.getElementById(id).style.display = 'none');
+    document.getElementById('graphsGrid').style.gridTemplateColumns = view === 'both' ? '1fr 1fr' : '1fr';
+    document.getElementById('btnBoth').className = 'side-btn' + (view === 'both' ? ' active-both' : '');
+    document.getElementById('btnPro').className  = 'side-btn' + (view === 'pro'  ? ' active-pro'  : '');
+    document.getElementById('btnCon').className  = 'side-btn' + (view === 'con'  ? ' active-con'  : '');
+  }
+</script>
+
+</body>
+</html>
