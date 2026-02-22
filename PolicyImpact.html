@@ -4,139 +4,110 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inflation Impact Analysis</title>
-
+<link rel="stylesheet" href="styles.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-  <link rel="stylesheet" href="styles.css">
-
 <style>
+  #main { max-width: 1200px; margin: 0 auto; padding: 40px 30px 60px; }
+  #main h1 { color: #1f4e79; margin-bottom: 6px; }
+  .subtitle { color: #777; font-size: 14px; margin-bottom: 26px; }
 
+  .info-boxes {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px; margin-bottom: 30px;
+  }
+  .info-box {
+    background: white; padding: 20px; border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid #1f4e79;
+  }
+  .info-box h3 { margin: 0 0 6px; font-size: 12px; color: #6c7a89; text-transform: uppercase; }
+  .info-box p  { margin: 0; font-size: 15px; font-weight: 600; color: #1f4e79; }
 
-.subtitle {
-  color: #777;
-  font-size: 14px;
-  margin-bottom: 26px;
-}
+  /* County selector */
+  .county-selector {
+    background: white; border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 24px 28px; margin-bottom: 26px;
+  }
+  .county-selector h2 { color: #1f4e79; font-size: 1.05rem; margin: 0 0 14px; }
+  .selector-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+  .selector-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 180px; }
+  .selector-group label { font-size: 11px; font-weight: 700; color: #1f4e79; text-transform: uppercase; letter-spacing: 0.5px; }
+  .selector-group select {
+    padding: 10px 14px; border: 1.5px solid #d0d7de; border-radius: 8px;
+    font-size: 14px; color: #2c3e50; background: white; cursor: pointer; outline: none;
+    transition: border-color 0.2s;
+  }
+  .selector-group select:focus { border-color: #1f4e79; }
 
-/* Info boxes */
-.info-boxes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  margin-bottom: 30px;
-}
+  .county-info-bar {
+    display: none; flex-wrap: wrap; gap: 10px; margin-top: 16px;
+    padding: 14px 16px; background: #f0f5fb;
+    border-radius: 10px; border: 1.5px solid #c8ddf0;
+  }
+  .info-badge {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 8px 14px; background: white; border-radius: 8px;
+    border: 1px solid #d0d7de; min-width: 130px;
+  }
+  .info-badge .badge-label { font-size: 10px; font-weight: 700; color: #6c7a89; text-transform: uppercase; letter-spacing: 0.5px; }
+  .info-badge .badge-value { font-size: 14px; font-weight: 600; color: #1f4e79; }
 
-.info-box {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  border-top: 4px solid #1f4e79;
-}
+  .rucc-bar { display: flex; gap: 4px; margin-top: 14px; align-items: center; }
+  .rucc-bar-label { font-size: 12px; color: #888; width: 70px; flex-shrink: 0; }
+  .rucc-segment {
+    flex: 1; height: 12px; border-radius: 3px; background: #e0e6ed; transition: background 0.3s;
+  }
+  .rucc-segment.active-metro  { background: #1f4e79; }
+  .rucc-segment.active-suburb { background: #2e75b6; }
+  .rucc-segment.active-rural  { background: #5b9bd5; }
+  .rucc-caption { font-size: 11px; color: #888; margin-top: 6px; text-align: center; }
+  .data-credit { font-size: 11px; color: #aaa; margin-top: 10px; }
+  .data-credit a { color: #2e75b6; text-decoration: none; }
+  .data-credit a:hover { text-decoration: underline; }
 
-.info-box h3 {
-  margin: 0 0 6px;
-  font-size: 12px;
-  color: #6c7a89;
-  text-transform: uppercase;
-}
+  /* Toggle */
+  .side-toggle { display: flex; gap: 12px; margin-bottom: 26px; }
+  .side-btn {
+    flex: 1; padding: 14px; border-radius: 12px;
+    border: 2px solid #d0d7de; background: white; cursor: pointer; font-weight: 600;
+    font-size: 14px; transition: all 0.15s;
+  }
+  .side-btn.active-both { background: #e8f1fb; border-color: #1f4e79; color: #1f4e79; }
+  .side-btn.active-pro  { background: #e8f5e9; border-color: #28a745; color: #155724; }
+  .side-btn.active-con  { background: #fce8e8; border-color: #dc3545; color: #7b241c; }
 
-.info-box p {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-  color: #1f4e79;
-}
+  /* Charts */
+  .graphs-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 20px; margin-bottom: 30px;
+  }
+  @media (max-width: 768px) { .graphs-grid { grid-template-columns: 1fr; } }
 
-/* Toggle */
-.side-toggle {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 26px;
-}
+  .graph-panel { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .graph-header {
+    padding: 14px 18px; border-bottom: 1px solid #eef1f5;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .graph-header.pro { border-left: 4px solid #28a745; }
+  .graph-header.con { border-left: 4px solid #dc3545; }
+  .graph-header h3 { margin: 0; font-size: 14px; color: #1f4e79; flex: 1; }
+  .graph-body { padding: 18px; }
+  .graph-desc { font-size: 13px; color: #666; margin-bottom: 14px; line-height: 1.6; }
+  .chart-wrapper { background: #f8fafc; border-radius: 8px; padding: 14px; }
+  .legend { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+  .legend-line { width: 24px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+  .legend-dashed { width: 24px; height: 0; border-top: 3px dashed #999; flex-shrink: 0; }
 
-.side-btn {
-  flex: 1;
-  padding: 14px;
-  border-radius: 12px;
-  border: 2px solid #d0d7de;
-  background: white;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.side-btn.active-both { background: #e8f1fb; border-color: #1f4e79; }
-.side-btn.active-pro  { background: #e8f5e9; border-color: #28a745; }
-.side-btn.active-con  { background: #fce8e8; border-color: #dc3545; }
-
-/* Charts */
-.graphs-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-@media (max-width: 768px) {
-  .graphs-grid { grid-template-columns: 1fr; }
-}
-
-.graph-panel {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.graph-header {
-  padding: 14px 18px;
-  border-bottom: 1px solid #eef1f5;
-  display: flex;
-  align-items: center;
-}
-
-.graph-header.pro { border-left: 4px solid #28a745; }
-.graph-header.con { border-left: 4px solid #dc3545; }
-
-.graph-header h3 {
-  margin: 0;
-  font-size: 14px;
-  color: #1f4e79;
-}
-
-.graph-body {
-  padding: 18px;
-}
-
-.graph-desc {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 14px;
-}
-
-.chart-wrapper {
-  background: #f8fafc;
-  border-radius: 8px;
-  padding: 14px;
-}
-
-/* Summary */
-.section-block {
-  background: white;
-  padding: 26px 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.section-block h2 {
-  color: #1f4e79;
-  margin-top: 0;
-}
+  .section-block {
+    background: white; padding: 26px 30px; border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  .section-block h2 { color: #1f4e79; margin-top: 0; }
+  .section-block p  { color: #555; line-height: 1.7; margin: 0; }
 </style>
 </head>
-
 <body>
-
 
 <div class="topbar">Economics Explorer</div>
 
@@ -151,159 +122,289 @@
 
 <section class="hero">
   <div class="hero-content">
-    <h1>Choose Your Location</h1>
-    <p>National, State, or County</p>
+    <h1>Inflation & Cost of Living</h1>
+    <p>County-level impact analysis</p>
   </div>
 </section>
 
 <div id="main">
 
-<h1>Inflation & Cost of Living</h1>
-<p class="subtitle">
-Comparing outcomes under high inflation versus controlled inflation across key economic indicators.
-</p>
+  <h1>Inflation Impact Analysis</h1>
+  <p class="subtitle">Select a county to see how inflation control policies are projected to affect that area based on its rural-urban classification and economic profile.</p>
 
-<div class="info-boxes">
-  <div class="info-box">
-    <h3>Economic Issue</h3>
-    <p>Inflation</p>
+  <div class="info-boxes">
+    <div class="info-box"><h3>Economic Issue</h3><p>Inflation</p></div>
+    <div class="info-box"><h3>Primary Metric</h3><p>Consumer Price Index</p></div>
+    <div class="info-box"><h3>Time Horizon</h3><p>2024 – 2029</p></div>
+    <div class="info-box"><h3>Affected</h3><p>All Households</p></div>
   </div>
-  <div class="info-box">
-    <h3>Primary Metric</h3>
-    <p>Consumer Price Index</p>
+
+  <div class="county-info-bar" id="countyInfoBar">
+  <div class="info-badge">
+    <div class="badge-label">County</div>
+    <div class="badge-value" id="badgeCounty">—</div>
   </div>
-  <div class="info-box">
-    <h3>Time Horizon</h3>
-    <p>2024 – 2029</p>
+  <div class="info-badge">
+    <div class="badge-label">State</div>
+    <div class="badge-value" id="badgeState">—</div>
   </div>
-  <div class="info-box">
-    <h3>Affected</h3>
-    <p>All Households</p>
+  <div class="info-badge">
+    <div class="badge-label">Population</div>
+    <div class="badge-value" id="badgePop">—</div>
+  </div>
+  <div class="info-badge">
+    <div class="badge-label">RUCC</div>
+    <div class="badge-value" id="badgeRUCC">—</div>
+  </div>
+  <div class="info-badge">
+    <div class="badge-label">Description</div>
+    <div class="badge-value" id="badgeDesc">—</div>
   </div>
 </div>
 
-<div class="side-toggle">
-  <button class="side-btn active-both" id="btnBoth" onclick="setView('both')">📊 Both Sides</button>
-  <button class="side-btn" id="btnPro" onclick="setView('pro')">✅ Supporting</button>
-  <button class="side-btn" id="btnCon" onclick="setView('con')">❌ Opposing</button>
+<div id="ruccBarWrapper" style="display:none;">
+  <div class="rucc-bar">
+    <div class="rucc-bar-label">Urban</div>
+    <div id="seg1" class="rucc-segment"></div>
+    <div id="seg2" class="rucc-segment"></div>
+    <div id="seg3" class="rucc-segment"></div>
+    <div id="seg4" class="rucc-segment"></div>
+    <div id="seg5" class="rucc-segment"></div>
+    <div id="seg6" class="rucc-segment"></div>
+    <div id="seg7" class="rucc-segment"></div>
+    <div id="seg8" class="rucc-segment"></div>
+    <div id="seg9" class="rucc-segment"></div>
+    <div class="rucc-bar-label">Rural</div>
+  </div>
+  <div id="ruccCaption" class="rucc-caption"></div>
 </div>
 
-<div class="graphs-grid" id="graphsGrid">
+  <!-- View toggle -->
+  <div class="side-toggle">
+    <button class="side-btn active-both" id="btnBoth" onclick="setView('both')">📊 Both Sides</button>
+    <button class="side-btn" id="btnPro"  onclick="setView('pro')">✅ Supporting</button>
+    <button class="side-btn" id="btnCon"  onclick="setView('con')">❌ Opposing</button>
+  </div>
 
-<div class="graph-panel" id="proPanel1">
-  <div class="graph-header pro">
-    <h3>Household Purchasing Power</h3>
-  </div>
-  <div class="graph-body">
-    <p class="graph-desc">
-      Supporters argue that controlling inflation preserves real income by preventing rising prices from eroding wages.
-    </p>
-    <div class="chart-wrapper"><canvas id="proChart1"></canvas></div>
-  </div>
-</div>
+  <div class="graphs-grid" id="graphsGrid">
 
-<div class="graph-panel" id="conPanel1">
-  <div class="graph-header con">
-    <h3>Employment & Economic Activity</h3>
-  </div>
-  <div class="graph-body">
-    <p class="graph-desc">
-      Critics warn that aggressive inflation control can slow growth, reduce hiring, and increase recession risk.
-    </p>
-    <div class="chart-wrapper"><canvas id="conChart1"></canvas></div>
-  </div>
-</div>
+    <div class="graph-panel" id="proPanel1">
+      <div class="graph-header pro"><h3>Household Purchasing Power</h3></div>
+      <div class="graph-body">
+        <p class="graph-desc" id="proDesc1">Select a county to see a location-adjusted projection.</p>
+        <div class="chart-wrapper"><canvas id="proChart1"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-line" style="background:#28a745"></div>Controlled inflation</div>
+          <div class="legend-item"><div class="legend-dashed"></div>High inflation</div>
+        </div>
+      </div>
+    </div>
 
-<div class="graph-panel" id="proPanel2">
-  <div class="graph-header pro">
-    <h3>Share of Income Spent on Essentials</h3>
-  </div>
-  <div class="graph-body">
-    <p class="graph-desc">
-      Lower inflation reduces the portion of household income devoted to food, housing, and energy.
-    </p>
-    <div class="chart-wrapper"><canvas id="proChart2"></canvas></div>
-  </div>
-</div>
+    <div class="graph-panel" id="conPanel1">
+      <div class="graph-header con"><h3>Employment & Economic Activity</h3></div>
+      <div class="graph-body">
+        <p class="graph-desc" id="conDesc1">Select a county to see a location-adjusted projection.</p>
+        <div class="chart-wrapper"><canvas id="conChart1"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-line" style="background:#dc3545"></div>Controlled inflation</div>
+          <div class="legend-item"><div class="legend-dashed"></div>High inflation</div>
+        </div>
+      </div>
+    </div>
 
-<div class="graph-panel" id="conPanel2">
-  <div class="graph-header con">
-    <h3>Consumer Price Index</h3>
-  </div>
-  <div class="graph-body">
-    <p class="graph-desc">
-      Even when inflation slows, prices often remain elevated rather than falling, delaying relief for households.
-    </p>
-    <div class="chart-wrapper"><canvas id="conChart2"></canvas></div>
-  </div>
-</div>
+    <div class="graph-panel" id="proPanel2">
+      <div class="graph-header pro"><h3>Share of Income Spent on Essentials</h3></div>
+      <div class="graph-body">
+        <p class="graph-desc" id="proDesc2">Select a county to see a location-adjusted projection.</p>
+        <div class="chart-wrapper"><canvas id="proChart2"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-line" style="background:#28a745"></div>Controlled inflation</div>
+          <div class="legend-item"><div class="legend-dashed"></div>High inflation</div>
+        </div>
+      </div>
+    </div>
 
-</div>
+    <div class="graph-panel" id="conPanel2">
+      <div class="graph-header con"><h3>Consumer Price Index</h3></div>
+      <div class="graph-body">
+        <p class="graph-desc" id="conDesc2">Select a county to see a location-adjusted projection.</p>
+        <div class="chart-wrapper"><canvas id="conChart2"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-line" style="background:#dc3545"></div>Controlled inflation</div>
+          <div class="legend-item"><div class="legend-dashed"></div>High inflation</div>
+        </div>
+      </div>
+    </div>
 
-<div class="section-block">
-<h2>Summary</h2>
-<p>
-Inflation policy reflects a tradeoff between price stability and economic momentum.
-Supporters emphasize long-term purchasing power and predictability, while critics warn
-that overly restrictive policies can slow growth and employment.
-</p>
-</div>
+  </div>
+
+  <div class="section-block">
+    <h2>Summary</h2>
+    <p>Inflation policy reflects a tradeoff between price stability and economic momentum. Supporters of aggressive inflation control emphasize long-term purchasing power and predictability. Critics warn that restrictive policies can slow growth and employment, particularly in rural counties where economies are less diversified and more sensitive to interest rate changes. The RUCC adjustment reflects that rural counties tend to have less economic buffer against both inflation and the side effects of controlling it.</p>
+  </div>
 
 </div>
 
 <script>
-const years = ['2024','2025','2026','2027','2028','2029'];
+  const years = ['2024','2025','2026','2027','2028','2029'];
+  let countyData = {}, stateMap = {}, charts = {};
 
-function makeChart(id, highInflation, controlled, color, yLabel) {
-  new Chart(document.getElementById(id), {
-    type: 'line',
-    data: {
-      labels: years,
-      datasets: [
-        {
-          label: 'High Inflation',
-          data: highInflation,
-          borderColor: '#999',
-          borderDash: [6,4],
-          fill: false,
-          tension: 0.3
-        },
-        {
-          label: 'Controlled Inflation',
-          data: controlled,
-          borderColor: color,
-          backgroundColor: color.replace('1)', '0.08)'),
-          fill: true,
-          tension: 0.3
-        }
-      ]
-    },
-    options: {
-      plugins: { legend: { display: false }},
-      scales: {
-        y: { title: { display: true, text: yLabel }},
-        x: { grid: { display: false }}
+  // Read location from URL params passed by location picker
+  const params  = new URLSearchParams(window.location.search);
+  const stateKey = params.get('state');   // e.g. "georgia"
+  const countyParam = params.get('county'); // e.g. "Fulton County"
+
+  fetch('Ruralurbancontinuumcodes2023.csv')
+    .then(r => r.text())
+    .then(csv => {
+      parseRUCC(csv);
+      autoLoadCounty();
+    })
+    .catch(() => {
+      document.getElementById('countyInfoBar').innerHTML =
+        '<p style="color:#aaa;font-size:13px;">⚠️ Could not load RUCC data. Make sure Ruralurbancontinuumcodes2023.csv is in the same folder.</p>';
+    });
+
+  function parseRUCC(text) {
+    const lines = text.trim().split('\n').slice(1);
+    lines.forEach(line => {
+      const cols = []; let cur = '', inQ = false;
+      for (let ch of line) {
+        if (ch === '"') inQ = !inQ;
+        else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+        else cur += ch;
       }
+      cols.push(cur.trim());
+      const [fips, state, county, attr, value] = cols;
+      if (!fips || !state) return;
+      if (!countyData[fips]) countyData[fips] = { state, name: county, pop: null, rucc: null, desc: null };
+      if (attr === 'Population_2020') countyData[fips].pop = parseInt(value);
+      if (attr === 'RUCC_2023')       countyData[fips].rucc = parseInt(value);
+      if (attr === 'Description')     countyData[fips].desc = value;
+      if (!stateMap[state]) stateMap[state] = [];
+      if (!stateMap[state].includes(fips)) stateMap[state].push(fips);
+    });
+  }
+
+  function autoLoadCounty() {
+    if (!stateKey && !countyParam) {
+      // No location passed — show national average message
+      document.getElementById('countyInfoBar').innerHTML =
+        '<p style="color:#888;font-size:13px;">📍 Showing national average projections.</p>';
+      document.getElementById('countyInfoBar').style.display = 'flex';
+      updateCharts({ name: 'the United States', state: 'National', pop: null, rucc: 5, desc: 'National average' });
+      return;
     }
-  });
-}
 
-makeChart('proChart1', [100,98,96,94,92,90], [100,101,103,105,107,109], 'rgba(40,167,69,1)', 'Purchasing Power Index');
-makeChart('conChart1', [100,101,102,103,104,105], [100,99,98,97,96,95], 'rgba(220,53,69,1)', 'Employment Index');
-makeChart('proChart2', [35,36,37,38,39,40], [35,33,31,30,29,28], 'rgba(40,167,69,1)', '% Income on Essentials');
-makeChart('conChart2', [100,104,108,112,116,120], [100,102,103,104,105,106], 'rgba(220,53,69,1)', 'CPI Index');
+    // Match county from URL params against RUCC data
+    const stateName = stateKey
+      ? Object.keys(stateMap).find(s => s.toLowerCase() === stateKey.replace(/-/g, ' ')) : null;
 
-function setView(view) {
-  ['proPanel1','proPanel2','conPanel1','conPanel2'].forEach(id => {
-    document.getElementById(id).style.display = 'block';
-  });
-  if (view === 'pro') ['conPanel1','conPanel2'].forEach(id => document.getElementById(id).style.display = 'none');
-  if (view === 'con') ['proPanel1','proPanel2'].forEach(id => document.getElementById(id).style.display = 'none');
-  document.getElementById('graphsGrid').style.gridTemplateColumns = view === 'both' ? '1fr 1fr' : '1fr';
-  document.getElementById('btnBoth').className = 'side-btn' + (view === 'both' ? ' active-both' : '');
-  document.getElementById('btnPro').className  = 'side-btn' + (view === 'pro'  ? ' active-pro'  : '');
-  document.getElementById('btnCon').className  = 'side-btn' + (view === 'con'  ? ' active-con'  : '');
-}
+    const fips = Object.keys(countyData).find(f => {
+      const c = countyData[f];
+      const stateMatch = !stateName || c.state === stateName;
+      const countyMatch = !countyParam || c.name.toLowerCase() === countyParam.toLowerCase();
+      return stateMatch && countyMatch;
+    });
+
+    if (fips) {
+      showCounty(countyData[fips]);
+    } else if (stateName) {
+      // State was passed but no county — use first county as representative sample
+      const firstFips = (stateMap[stateName] || [])[0];
+      if (firstFips) showCounty(countyData[firstFips]);
+    }
+  }
+
+  function showCounty(c) {
+    document.getElementById('badgeCounty').textContent = c.name;
+    document.getElementById('badgeState').textContent  = c.state;
+    document.getElementById('badgePop').textContent    = c.pop ? c.pop.toLocaleString() : '—';
+    document.getElementById('badgeRUCC').textContent   = c.rucc ?? '—';
+    document.getElementById('badgeDesc').textContent   = c.desc ?? '—';
+    document.getElementById('countyInfoBar').style.display = 'flex';
+    document.getElementById('ruccBarWrapper').style.display = 'block';
+
+    for (let i = 1; i <= 9; i++) {
+      const seg = document.getElementById(`seg${i}`);
+      seg.className = 'rucc-segment';
+      if (i === c.rucc) seg.classList.add(i <= 3 ? 'active-metro' : i <= 5 ? 'active-suburb' : 'active-rural');
+    }
+    document.getElementById('ruccCaption').textContent =
+      `${c.name} is at position ${c.rucc} of 9 on the rural-urban continuum (1 = most urban, 9 = most rural)`;
+
+    updateCharts(c);
+  }
+
+  // Rural counties feel inflation more acutely — less economic diversification, lower income buffers
+  function ruccFactor(rucc) { return 0.6 + (rucc - 1) * 0.1; } // 0.6 (urban) → 1.4 (rural)
+
+  function updateCharts(c) {
+    const f    = ruccFactor(c.rucc);
+    const name = c.name;
+    const isRural = c.rucc >= 7, isUrban = c.rucc <= 3;
+    const tag = isRural ? 'rural' : isUrban ? 'urban' : 'mid-size';
+
+    // Pro 1: purchasing power
+    const hiPow = [100, 98,  96,  94,  92,  90];
+    const coPow = hiPow.map((v,i) => +(v + i * 2.0 * f).toFixed(1));
+    document.getElementById('proDesc1').textContent =
+      `In ${name} (RUCC ${c.rucc}), controlling inflation preserves purchasing power ${isRural ? 'more significantly than in urban areas, as rural households have less financial cushion against rising prices' : 'at a moderate rate, reflecting typical urban wage buffers'}.`;
+    renderChart('proChart1', hiPow, coPow, 'rgba(40,167,69,1)', 'Purchasing Power Index');
+
+    // Con 1: employment
+    const hiEmp = [100, 101, 102, 103, 104, 105];
+    const coEmp = hiEmp.map((v,i) => +(v - i * 1.8 * f).toFixed(1));
+    document.getElementById('conDesc1').textContent =
+      `Tight monetary policy to control inflation may reduce hiring in ${name}. ${isRural ? 'Rural economies with fewer industries are more sensitive to interest rate rises.' : 'Urban economies are somewhat more resilient due to greater industry diversification.'}`;
+    renderChart('conChart1', hiEmp, coEmp, 'rgba(220,53,69,1)', 'Employment Index');
+
+    // Pro 2: essentials spending
+    const hiEss = [35, 36, 37, 38, 39, 40];
+    const coEss = hiEss.map((v,i) => +(v - i * 1.5 * f).toFixed(1));
+    document.getElementById('proDesc2').textContent =
+      `Households in ${name} spend a ${isRural ? 'larger-than-average' : 'typical'} share of income on essentials. Controlled inflation would reduce this burden ${isRural ? 'meaningfully' : 'moderately'} over time.`;
+    renderChart('proChart2', hiEss, coEss, 'rgba(40,167,69,1)', '% Income on Essentials');
+
+    // Con 2: CPI
+    const hiCPI = [100, 104, 108, 112, 116, 120];
+    const coCPI = hiCPI.map((v,i) => +(100 + i * (0.4 + (9 - c.rucc) * 0.1)).toFixed(1));
+    document.getElementById('conDesc2').textContent =
+      `Even under controlled inflation, prices in ${name} remain elevated rather than falling — providing only gradual relief. ${isRural ? 'Rural supply chains make local price reductions slower.' : 'Urban markets tend to see faster price adjustment.'}`;
+    renderChart('conChart2', hiCPI, coCPI, 'rgba(220,53,69,1)', 'CPI Index');
+  }
+
+  function renderChart(id, high, controlled, color, yLabel) {
+    if (charts[id]) charts[id].destroy();
+    charts[id] = new Chart(document.getElementById(id).getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: years,
+        datasets: [
+          { label: 'High Inflation', data: high, borderColor: '#bbb', borderDash: [6,4], fill: false, tension: 0.3, pointRadius: 3 },
+          { label: 'Controlled', data: controlled, borderColor: color, backgroundColor: color.replace('1)', '0.08)'), fill: true, tension: 0.3, pointRadius: 4, pointBackgroundColor: color }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+        scales: {
+          y: { title: { display: true, text: yLabel, font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function setView(view) {
+    ['proPanel1','proPanel2','conPanel1','conPanel2'].forEach(id => document.getElementById(id).style.display = 'block');
+    if (view === 'pro') ['conPanel1','conPanel2'].forEach(id => document.getElementById(id).style.display = 'none');
+    if (view === 'con') ['proPanel1','proPanel2'].forEach(id => document.getElementById(id).style.display = 'none');
+    document.getElementById('graphsGrid').style.gridTemplateColumns = view === 'both' ? '1fr 1fr' : '1fr';
+    document.getElementById('btnBoth').className = 'side-btn' + (view === 'both' ? ' active-both' : '');
+    document.getElementById('btnPro').className  = 'side-btn' + (view === 'pro'  ? ' active-pro'  : '');
+    document.getElementById('btnCon').className  = 'side-btn' + (view === 'con'  ? ' active-con'  : '');
+  }
 </script>
 
 </body>
