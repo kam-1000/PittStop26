@@ -73,21 +73,8 @@ nav a:hover {
 .hero-content h1 { font-size: 2.5rem; margin-bottom: 12px; }
 .hero-content p { font-size: 1.1rem; margin-bottom: 28px; opacity: 0.9; }
 
-.hero-btn {
-    padding: 12px 28px;
-    background: white;
-    color: #1f4e79;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    transition: 0.2s;
-}
-
-.hero-btn:hover { background: #e8f1fb; }
-
 /* Main */
-#main { padding: 30px; }
+#main { padding: 30px 30px 100px;}
 
 /* Dashboard Grid */
 .dashboard {
@@ -119,6 +106,8 @@ nav a:hover {
 }
 
 .content-section h2 { margin-top: 0; color: #1f4e79; }
+
+.page-footer {padding: 30px 20px;}
 
 /* Responsive */
 @media (max-width: 768px) {
